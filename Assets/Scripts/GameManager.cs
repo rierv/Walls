@@ -5,6 +5,8 @@ using System.Linq;
 using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
+    public GameObject EndButton;
+
     public Text Score, Blocks;
     public bool stopAtFirstHit = false;
     public Material visitedMaterial = null;
@@ -56,6 +58,13 @@ public class GameManager : MonoBehaviour
             //Random.InitState(RandomSeed);
             //CreateLabyrinth(g, matrix, edgeProbability);
             CreateGraph(g, matrix);
+            float xCoord = (matrix[0, 0].sceneObject.transform.position.x + matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x) / 2;
+            float zCoord = (matrix[0, 0].sceneObject.transform.position.z + matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z) / 2;
+            float yCoord = 1.5f*Mathf.Max(matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x - matrix[0, 0].sceneObject.transform.position.x,
+                 matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z - matrix[0, 0].sceneObject.transform.position.z);
+            Vector3 cameraPosition = new Vector3(xCoord,yCoord, zCoord);
+
+            GameObject.Find("Main Camera").transform.position = cameraPosition;
             // ask A* to solve the problem
             AStarStepSolver.immediateStop = stopAtFirstHit;
             AStarStepSolver.Init(g, matrix[0, 0], matrix[x - 1, y - 1], myHeuristics[(int)heuristicToUse]);
@@ -119,7 +128,9 @@ public class GameManager : MonoBehaviour
             // check if there is a solution
             if (path.Length == 0)
             {
-                UnityEditor.EditorUtility.DisplayDialog("Sorry, No solution", "Score: "+ Score.text, "OK");
+                EndButton.SetActive(true);
+                EndButton.GetComponentInChildren<Text>().text= "Sorry, No solution left\nScore: " + Score.text;
+                //UnityEditor.EditorUtility.DisplayDialog("Sorry, No solution", "Score: "+ Score.text, "OK");
                 done = true;
             }
             else
@@ -129,7 +140,9 @@ public class GameManager : MonoBehaviour
                 OutlinePath(totalPath.ToArray(), startMaterial, trackMaterial, endMaterial);
                 if (path[0].to == matrix[x - 1, y - 1])
                 {
-                    UnityEditor.EditorUtility.DisplayDialog("Sorry, End of the Run", "Score: " + Score.text, "OK");
+                    EndButton.SetActive(true);
+                    EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
+                    //UnityEditor.EditorUtility.DisplayDialog("Sorry, End of the Run", "Score: " + Score.text, "OK");
                     done = true;
                 }
 
@@ -138,7 +151,11 @@ public class GameManager : MonoBehaviour
             Score.text = ""+(int.Parse(Score.text) + 1);
             yield return new WaitForSeconds(pause);
         }
+    }
+    public void Restart()
+    {
         Scenes.Load("MainMenu");
+
     }
 
     protected void OutlineNode(Node n, Material m)

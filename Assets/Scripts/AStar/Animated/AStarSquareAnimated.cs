@@ -41,7 +41,7 @@ public class AStarSquareAnimated : AStarSquare {
 		Edge [] path = AStarStepSolver.solution;
 		// check if there is a solution
 		if (path.Length == 0) {
-			UnityEditor.EditorUtility.DisplayDialog ("Sorry", "No solution", "OK");
+			//UnityEditor.EditorUtility.DisplayDialog ("Sorry", "No solution", "OK");
 		} else {
 			// if yes, outline it
 			OutlinePath (path, startMaterial, trackMaterial, endMaterial);
