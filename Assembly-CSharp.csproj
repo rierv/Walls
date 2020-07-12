@@ -62,23 +62,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Pathfinding\AStar\AStarSolver.cs" />
-    <Compile Include="Assets\Pathfinding\AStar\AStarSquare.cs" />
-    <Compile Include="Assets\Pathfinding\AStar\AStarSquareBasic.cs" />
-    <Compile Include="Assets\Pathfinding\AStar\Animated\AStarSquareAnimated.cs" />
-    <Compile Include="Assets\Pathfinding\AStar\Animated\AStarStepSolver.cs" />
-    <Compile Include="Assets\Pathfinding\Dijkstra\Animated\DijkstraSquareAnimated.cs" />
-    <Compile Include="Assets\Pathfinding\Dijkstra\Animated\DijkstraStepSolver.cs" />
-    <Compile Include="Assets\Pathfinding\Dijkstra\DijkstraMountain.cs" />
-    <Compile Include="Assets\Pathfinding\Dijkstra\DijkstraSolver.cs" />
-    <Compile Include="Assets\Pathfinding\Dijkstra\DijkstraSquare.cs" />
-    <Compile Include="Assets\Pathfinding\Graph\Edge.cs" />
-    <Compile Include="Assets\Pathfinding\Graph\Graph.cs" />
-    <Compile Include="Assets\Pathfinding\Graph\Node.cs" />
-    <Compile Include="Assets\Pathfinding\Graph\TileGraph.cs" />
-    <Compile Include="Assets\Pathfinding\NavMeshes\ChaseSomething.cs" />
-    <Compile Include="Assets\Pathfinding\NavMeshes\ChaseWithLOS.cs" />
-    <Compile Include="Assets\Pathfinding\NavMeshes\GoSomewhere.cs" />
+    <Compile Include="Assets\Scripts\AStar\AStarSolver.cs" />
+    <Compile Include="Assets\Scripts\AStar\AStarSquare.cs" />
+    <Compile Include="Assets\Scripts\AStar\AStarSquareBasic.cs" />
+    <Compile Include="Assets\Scripts\AStar\Animated\AStarSquareAnimated.cs" />
+    <Compile Include="Assets\Scripts\AStar\Animated\AStarStepSolver.cs" />
+    <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Graph\Edge.cs" />
+    <Compile Include="Assets\Scripts\Graph\Graph.cs" />
+    <Compile Include="Assets\Scripts\Graph\Node.cs" />
+    <Compile Include="Assets\Scripts\Graph\TileGraph.cs" />
+    <Compile Include="Assets\Scripts\Scenes.cs" />
+    <Compile Include="Assets\Scripts\UI\ExitButton.cs" />
+    <Compile Include="Assets\Scripts\UI\StartButton.cs" />
+    <Compile Include="Assets\Scripts\UI\ValueManager.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/rierv/Desktop/walls/theWalls/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
