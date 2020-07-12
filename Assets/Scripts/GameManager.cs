@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour
             // check if there is a solution
             if (path.Length == 0)
             {
-                UnityEditor.EditorUtility.DisplayDialog("Sorry", "No solution", "OK");
+                UnityEditor.EditorUtility.DisplayDialog("Sorry, No solution", "Score: "+ Score.text, "OK");
                 done = true;
             }
             else
@@ -127,7 +127,11 @@ public class GameManager : MonoBehaviour
                 // if yes, outline it
                 totalPath.Add(path[0]);
                 OutlinePath(totalPath.ToArray(), startMaterial, trackMaterial, endMaterial);
-                if (path[0].to == matrix[x - 1, y - 1]) done = true;
+                if (path[0].to == matrix[x - 1, y - 1])
+                {
+                    UnityEditor.EditorUtility.DisplayDialog("Sorry, End of the Run", "Score: " + Score.text, "OK");
+                    done = true;
+                }
 
             }
             AStarStepSolver.Init(g, totalPath[totalPath.Count-1].to, matrix[x - 1, y - 1], myHeuristics[(int)heuristicToUse]);
