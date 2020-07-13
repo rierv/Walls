@@ -405,14 +405,14 @@ public class GameManager : MonoBehaviour
             AStarStepSolver.Init(g, start, n, myHeuristics[(int)heuristicToUse]);
             while (AStarStepSolver.Step())
             {
-                OutlineSet(AStarStepSolver.visited, visitedMaterial);
+                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
             }
             newPath = AStarStepSolver.solution;
             count = AStarStepSolver.solution.Length;
             AStarStepSolver.Init(g, n, matrix[x - 1, y - 1], myHeuristics[(int)heuristicToUse]);
             while (AStarStepSolver.Step())
             {
-                OutlineSet(AStarStepSolver.visited, visitedMaterial);
+                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
             }
             count = count + AStarStepSolver.solution.Length;
             if (count < min)
