@@ -25,7 +25,7 @@ MonoBehaviour:
   m_MinSize: {x: 708, y: 471}
   m_MaxSize: {x: 18003, y: 14021}
   vertical: 0
-  controlID: 902
+  controlID: 779
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -74,10 +74,10 @@ MonoBehaviour:
     m_VRangeLocked: 0
     hZoomLockedByDefault: 0
     vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -149.66667
-    m_HBaseRangeMax: 149.66667
-    m_VBaseRangeMin: -89.333336
-    m_VBaseRangeMax: 89.333336
+    m_HBaseRangeMin: -224.5
+    m_HBaseRangeMax: 224.5
+    m_VBaseRangeMin: -134
+    m_VBaseRangeMax: 134
     m_HAllowExceedBaseRangeMin: 1
     m_HAllowExceedBaseRangeMax: 1
     m_VAllowExceedBaseRangeMin: 1
@@ -141,7 +141,7 @@ MonoBehaviour:
   m_MinSize: {x: 201, y: 442}
   m_MaxSize: {x: 4001, y: 8042}
   vertical: 1
-  controlID: 878
+  controlID: 755
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_ViewDataDictionary: {fileID: 0}
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 20392
+  m_LastSelectedObjectID: 14150
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -462,7 +462,7 @@ MonoBehaviour:
   m_MinSize: {x: 232, y: 471}
   m_MaxSize: {x: 10002, y: 14021}
   vertical: 1
-  controlID: 903
+  controlID: 780
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -520,7 +520,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 62fbffff
+      m_ExpandedIDs: 58ebffffd0faffff70fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -675,8 +675,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
+    m_SelectedInstanceIDs: 3a370000
+    m_LastClickedInstanceID: 14138
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: 7a290000c627000000000000f6270000
     m_RenameOverlay:
@@ -768,5 +768,5 @@ MonoBehaviour:
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_PreviewWindow: {fileID: 0}
-  m_LastInspectedObjectInstanceID: -1
+  m_LastInspectedObjectInstanceID: 14138
   m_LastVerticalScrollValue: 0

@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
     bool freeze = false;
     int boostCount = 0;
     int freezeCount = 0;
+    bool start = false;
     public float acceleration = 1.008f;
     List<Node> boostList = new List<Node>();
     List<Node> freezeList = new List<Node>();
@@ -85,15 +86,21 @@ public class GameManager : MonoBehaviour
             AStarStepSolver.immediateStop = stopAtFirstHit;
             AStarStepSolver.Init(g, matrix[0, 0], matrix[x - 1, y - 1], myHeuristics[(int)heuristicToUse]);
 
-            // Outline visited nodes
+            OutlineNode(matrix[0, 0], endMaterial);
 
-            StartCoroutine(AnimateSolution());
-            StartCoroutine(BlocksRecovery(10/blocks));
+
         }
+        start = true;
     }
 
     void Update()
     {
+        if (start && Input.touchCount == 1 && Input.GetTouch(0).phase == 0)
+        {
+            StartCoroutine(AnimateSolution());
+            StartCoroutine(BlocksRecovery(10 / blocks));
+            start = false;
+        }
         if (Input.touchCount == 1 && Input.GetTouch(0).phase == 0)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
@@ -137,7 +144,7 @@ public class GameManager : MonoBehaviour
 
             while (AStarStepSolver.Step())
             {
-                OutlineSet(AStarStepSolver.visited, visitedMaterial);
+                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
                 //OutlineNode(AStarStepSolver.current, trackMaterial);
             }
             Edge[] path = AStarStepSolver.solution;
@@ -154,7 +161,7 @@ public class GameManager : MonoBehaviour
                 if (boost) path = pathToBoost(path, path[0].from);
                 // if yes, outline it
                 totalPath.Add(path[0]);
-                OutlinePath(totalPath.ToArray(), startMaterial, trackMaterial, endMaterial);
+                OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, endMaterial);
                 if (path[0].to == matrix[x - 1, y - 1])
                 {
                     EndButton.SetActive(true);
