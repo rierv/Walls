@@ -59,6 +59,11 @@ public class Graph {
 		if (!data.ContainsKey (n)) return new Edge[0];
 		return data [n].ToArray ();
 	}
+    public void changeWeight(String n, float newWeight)
+    {
+        foreach (Edge e in data[getNode(n)]) e.weight = newWeight;
+        return;
+    }
 
     public Node getNode(String Description)
     {

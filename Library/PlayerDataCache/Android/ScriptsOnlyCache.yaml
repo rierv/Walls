@@ -57,21 +57,21 @@ ScriptsOnlyBuild:
     - Class: 108
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 11152}
+      Script: {instanceID: 11154}
     - Class: 114
-      Script: {instanceID: 11312}
+      Script: {instanceID: 11314}
     - Class: 114
-      Script: {instanceID: 11352}
+      Script: {instanceID: 11354}
     - Class: 114
-      Script: {instanceID: 11738}
+      Script: {instanceID: 11740}
     - Class: 114
-      Script: {instanceID: 12122}
+      Script: {instanceID: 12124}
     - Class: 114
-      Script: {instanceID: 12606}
+      Script: {instanceID: 12608}
     - Class: 114
-      Script: {instanceID: 12770}
+      Script: {instanceID: 12772}
     - Class: 114
-      Script: {instanceID: 12960}
+      Script: {instanceID: 12962}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -108,25 +108,25 @@ ScriptsOnlyBuild:
     - Class: 108
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 11152}
+      Script: {instanceID: 11154}
     - Class: 114
-      Script: {instanceID: 11216}
+      Script: {instanceID: 11218}
     - Class: 114
-      Script: {instanceID: 11312}
+      Script: {instanceID: 11314}
     - Class: 114
-      Script: {instanceID: 11352}
+      Script: {instanceID: 11354}
     - Class: 114
-      Script: {instanceID: 11738}
+      Script: {instanceID: 11740}
     - Class: 114
-      Script: {instanceID: 12122}
+      Script: {instanceID: 12124}
     - Class: 114
-      Script: {instanceID: 12296}
+      Script: {instanceID: 12298}
     - Class: 114
-      Script: {instanceID: 12606}
+      Script: {instanceID: 12608}
     - Class: 114
-      Script: {instanceID: 12826}
+      Script: {instanceID: 12828}
     - Class: 114
-      Script: {instanceID: 12960}
+      Script: {instanceID: 12962}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -404,7 +404,7 @@ ScriptsOnlyBuild:
     className: VerticalLayoutGroup
   - hash:
       serializedVersion: 2
-      Hash: d52fd8a3d7577504ce9b2374e6851966
+      Hash: e01c3dc52a44c1a21f9eb84d47a3c7d9
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: StartButton
@@ -494,7 +494,7 @@ ScriptsOnlyBuild:
     className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
-      Hash: a337af437fe71eea35456b05b726815b
+      Hash: 5e712ef8e2f5666839e36e66d6ed9de7
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager
