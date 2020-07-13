@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 
     public Text Score, Blocks;
     public bool stopAtFirstHit = false;
-    public Material visitedMaterial = null;
+    public Material visitedMaterial = null, defaultMaterial = null;
     
     public enum Heuristics { Euclidean, Manhattan, Bisector, FullBisector, Zero };
     public HeuristicFunction[] myHeuristics = { EuclideanEstimator, ManhattanEstimator, BisectorEstimator,
@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (start && Input.touchCount == 1 && Input.GetTouch(0).phase == 0)
+        if (start && Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended)
         {
             StartCoroutine(AnimateSolution());
             StartCoroutine(BlocksRecovery(10 / blocks));
@@ -108,7 +108,6 @@ public class GameManager : MonoBehaviour
             Debug.DrawRay(ray.origin, ray.direction * 100, Color.yellow, 100f);
             if (Physics.Raycast(ray, out hit))
             {
-                Debug.Log(hit.transform.name);
                 if (hit.collider != null&&int.Parse(Blocks.text)>0)
                 {
                     bool found=false;
@@ -122,7 +121,6 @@ public class GameManager : MonoBehaviour
                     if (!found&&(!boost||!boostList.Contains(n))&& (!freeze || !freezeList.Contains(n)))
                     {
                         OutlineNode(n, startMaterial);
-                        Debug.Log(n.description);
                         g.RemoveNode(n);
                     }
                 }
@@ -160,6 +158,8 @@ public class GameManager : MonoBehaviour
             {
                 if (boost) path = pathToBoost(path, path[0].from);
                 // if yes, outline it
+                ClearGridFromVisitedNodes();
+                OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
                 totalPath.Add(path[0]);
                 OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, endMaterial);
                 if (path[0].to == matrix[x - 1, y - 1])
@@ -396,31 +396,60 @@ public class GameManager : MonoBehaviour
     }
     public Edge[] pathToBoost(Edge [] path, Node start)
     {
-        int count = 0;
-        int min = path.Length + 4;
+        float stepToBoostCount = 0;
+        float stepToEndCount = 0;
+        float min = (path.Length)/2;
+        Node newTarget=null;
         Edge [] newPath;
         foreach(Node n in boostList)
         {
-            count = 0;
+            stepToBoostCount = 0;
+            stepToEndCount = 0;
             AStarStepSolver.Init(g, start, n, myHeuristics[(int)heuristicToUse]);
             while (AStarStepSolver.Step())
             {
                 //OutlineSet(AStarStepSolver.visited, visitedMaterial);
             }
             newPath = AStarStepSolver.solution;
-            count = AStarStepSolver.solution.Length;
+            stepToBoostCount = AStarStepSolver.solution.Length*0.8f;
             AStarStepSolver.Init(g, n, matrix[x - 1, y - 1], myHeuristics[(int)heuristicToUse]);
             while (AStarStepSolver.Step())
             {
                 //OutlineSet(AStarStepSolver.visited, visitedMaterial);
             }
-            count = count + AStarStepSolver.solution.Length;
-            if (count < min)
+            stepToEndCount = stepToBoostCount + AStarStepSolver.solution.Length*0.2f;
+            if (stepToEndCount>0 && stepToEndCount < min)
             {
-                min = count;
+                min = stepToEndCount;
                 path = newPath;
+                newTarget = n;
             }
         }
+        if (newTarget != null)
+        {
+            AStarStepSolver.Init(g, start, newTarget, myHeuristics[(int)heuristicToUse]);
+            while (AStarStepSolver.Step()) ;
+        }
+        else
+        {
+            AStarStepSolver.Init(g, start, matrix[x - 1, y - 1], myHeuristics[(int)heuristicToUse]);
+            while (AStarStepSolver.Step()) ;
+        }
         return path;
+    }
+    private void ClearGridFromVisitedNodes()
+    {
+        GameObject o = new GameObject();
+        o.AddComponent<MeshRenderer>();
+        o.GetComponent<MeshRenderer>().material = visitedMaterial;
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+            for (int j = 0; j < matrix.GetLength(1); j++)
+            {
+                Debug.Log(matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material + "" == o.GetComponent<MeshRenderer>().material + "");
+                if (matrix[i,j].sceneObject.GetComponent<MeshRenderer>().material + ""== o.GetComponent<MeshRenderer>().material+"") matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = defaultMaterial;
+
+            }
+        }
     }
 }

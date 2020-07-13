@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class AStarStepSolver : AStarSolver {
 
 	public static Edge[] solution;
+    public static List<Node> solutionNodes;
 	public static Node current;
 	
 	static Graph graph;
@@ -32,6 +33,7 @@ public class AStarStepSolver : AStarSolver {
 			status [n] = ne;
 		}
 		solution = null;
+        solutionNodes = new List<Node>();
 	}
 
 	public static bool Step() {
@@ -77,6 +79,7 @@ public class AStarStepSolver : AStarSolver {
 			Node walker = goalNode;
 
 			while (walker != startNode) {
+                solutionNodes.Add(walker);
 				result.Add (status [walker].predecessor);
 				walker = status [walker].predecessor.from;
 			}
