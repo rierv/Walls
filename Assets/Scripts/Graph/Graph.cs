@@ -20,7 +20,7 @@ public class Graph {
         {
             data[e.from].Add(e);
             e = new Edge(e.to, e.from);
-            data[e.to].Add(e);
+            if (!data[e.from].Contains(e)) data[e.to].Add(e);
         }
     }
 
@@ -34,7 +34,7 @@ public class Graph {
                 {
                     if (f.to == n)
                     {
-                        data[e.to].Remove(f);
+                        if (data[e.to].Contains(f)) data[e.to].Remove(f);
                     }
                 }
             }
