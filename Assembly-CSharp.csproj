@@ -74,6 +74,7 @@
     <Compile Include="Assets\Scripts\Graph\TileGraph.cs" />
     <Compile Include="Assets\Scripts\Scenes.cs" />
     <Compile Include="Assets\Scripts\UI\ExitButton.cs" />
+    <Compile Include="Assets\Scripts\UI\LimitedValueManager.cs" />
     <Compile Include="Assets\Scripts\UI\StartButton.cs" />
     <Compile Include="Assets\Scripts\UI\ValueManager.cs" />
     <Reference Include="Unity.Timeline.Editor">

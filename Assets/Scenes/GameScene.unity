@@ -167,7 +167,8 @@ MonoBehaviour:
   gap: 1.5
   startMaterial: {fileID: 2100000, guid: 409f80573f4a04dde9f006374666accf, type: 2}
   trackMaterial: {fileID: 2100000, guid: 2ffd7958ed7334a3aa4b46ff03490521, type: 2}
-  endMaterial: {fileID: 2100000, guid: 14cf3ee727fd644978dcfc83119390e7, type: 2}
+  npcMaterial: {fileID: 2100000, guid: 14cf3ee727fd644978dcfc83119390e7, type: 2}
+  endMaterial: {fileID: 2100000, guid: 39774c6a81d33b942a9fcf5637418c99, type: 2}
   boostMaterial: {fileID: 2100000, guid: a193cae4bf10a024386c9f7558d0ceaf, type: 2}
   freezeMaterial: {fileID: 2100000, guid: 2d31771e07a1734489e10efb703af10e, type: 2}
   delay: 0.5

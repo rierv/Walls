@@ -3,6 +3,7 @@ ScriptsOnlyBuild:
     Assembly-CSharp.dll:
     - ExitButton
     - GameManager
+    - LimitedValueManager
     - StartButton
     - ValueManager
     Unity.Rider.Editor.dll:
@@ -26,6 +27,7 @@ ScriptsOnlyBuild:
     - UnityEngine.UI.GraphicRaycaster
     - UnityEngine.UI.Image
     - UnityEngine.UI.Text
+    - UnityEngine.UI.Toggle
   sceneClasses:
     Assets/Scenes/GameScene.unity:
     - Class: 1
@@ -127,6 +129,10 @@ ScriptsOnlyBuild:
       Script: {instanceID: 12826}
     - Class: 114
       Script: {instanceID: 12960}
+    - Class: 114
+      Script: {instanceID: 12974}
+    - Class: 114
+      Script: {instanceID: 24444}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -350,7 +356,7 @@ ScriptsOnlyBuild:
     className: ScrollRect
   - hash:
       serializedVersion: 2
-      Hash: 2bd75bc95613146dd9532303d2ddda2b
+      Hash: f6a0dbe065a2391935e3d44723f63ff9
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: AStarSquareAnimated
@@ -392,7 +398,7 @@ ScriptsOnlyBuild:
     className: RawImage
   - hash:
       serializedVersion: 2
-      Hash: 77c301a32860b2a708b5006b8b4a0bd5
+      Hash: 862438a82066b7eb5271d559f273ea11
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: AStarSquare
@@ -404,7 +410,7 @@ ScriptsOnlyBuild:
     className: VerticalLayoutGroup
   - hash:
       serializedVersion: 2
-      Hash: e01c3dc52a44c1a21f9eb84d47a3c7d9
+      Hash: eeb8bfe9b7f302af3eb4368d7fe5b8df
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: StartButton
@@ -494,7 +500,7 @@ ScriptsOnlyBuild:
     className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
-      Hash: d44a57faed6ceb6242cc2f0840197ce1
+      Hash: fd826149e9d00e7a95308954eaa5c584
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager
@@ -536,7 +542,7 @@ ScriptsOnlyBuild:
     className: Outline
   - hash:
       serializedVersion: 2
-      Hash: 77c301a32860b2a708b5006b8b4a0bd5
+      Hash: 862438a82066b7eb5271d559f273ea11
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: AStarSquareBasic
@@ -606,6 +612,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
+  - hash:
+      serializedVersion: 2
+      Hash: 65d9a3c9dbfb44c2cc34967916ee4a8a
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: LimitedValueManager
   platform: 13
   scenePathNames:
   - Assets/Scenes/MainMenu.unity

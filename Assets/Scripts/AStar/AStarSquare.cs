@@ -20,6 +20,7 @@ public class AStarSquare : MonoBehaviour {
     public float gap = 3f;
     public Material startMaterial = null;
     public Material trackMaterial = null;
+    public Material npcMaterial = null;
     public Material endMaterial = null;
 
     // what to put on the scene, not really meaningful
@@ -53,7 +54,7 @@ public class AStarSquare : MonoBehaviour {
 				//UnityEditor.EditorUtility.DisplayDialog ("Sorry", "No solution", "OK");
 			} else {
 				// if yes, outline it
-                OutlinePath(path, startMaterial, trackMaterial, endMaterial);
+                OutlinePath(path, startMaterial, trackMaterial, npcMaterial);
 			}
 		}
 	}

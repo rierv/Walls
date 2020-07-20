@@ -24,7 +24,7 @@ public class Graph {
         }
     }
 
-    public void RemoveNode(Node n)
+    public void RemoveNodeConnections(Node n)
     {
         if (data.ContainsKey(n))
         {
@@ -38,7 +38,34 @@ public class Graph {
                     }
                 }
             }
-            data.Remove(n);
+            //data.Remove(n);
+        }
+    }
+    public void AddNodeConnections(Node n, Node [,] crossings, List<Node> blockList)
+    {
+        if (data.ContainsKey(n))
+        {
+            if (n.x > 0 && !blockList.Contains(crossings[n.x - 1, n.y])) {
+                AddEdge(new Edge(crossings[n.x - 1, n.y], n));
+                AddEdge(new Edge(n, crossings[n.x - 1, n.y]));
+            }
+            if (n.y > 0 && !blockList.Contains(crossings[n.x, n.y-1]))
+            {
+                AddEdge(new Edge(crossings[n.x, n.y - 1], n));
+                AddEdge(new Edge(n, crossings[n.x, n.y - 1]));
+            }
+            if (n.x < crossings.GetLength(0)-2 && !blockList.Contains(crossings[n.x + 1, n.y]))
+            {
+                AddEdge(new Edge(crossings[n.x + 1, n.y], n));
+                AddEdge(new Edge(n, crossings[n.x + 1, n.y]));
+            }
+            if (n.y < crossings.GetLength(1) - 2 && !blockList.Contains(crossings[n.x, n.y+1]))
+            {
+                AddEdge(new Edge(crossings[n.x, n.y+1], n));
+                AddEdge(new Edge(n, crossings[n.x, n.y+1]));
+            }
+            
+            //data.Remove(n);
         }
     }
 
