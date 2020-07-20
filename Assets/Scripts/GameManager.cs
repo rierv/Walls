@@ -90,8 +90,8 @@ public class GameManager : MonoBehaviour
             //CreateLabyrinth(g, matrix, edgeProbability);
             float xCoord = (matrix[0, 0].sceneObject.transform.position.x + matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x) / 2;
             float zCoord = (matrix[0, 0].sceneObject.transform.position.z + matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z) / 2;
-            float yCoord = 1.5f*Mathf.Max(matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x - matrix[0, 0].sceneObject.transform.position.x,
-                 matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z - matrix[0, 0].sceneObject.transform.position.z);
+            float yCoord = (Mathf.Max(matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x - matrix[0, 0].sceneObject.transform.position.x,
+                 matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z - matrix[0, 0].sceneObject.transform.position.z)/3.5f*-Mathf.Tan(30)/2f)+15;
             Vector3 cameraPosition = new Vector3(xCoord,yCoord, zCoord);
 
             GameObject.Find("Main Camera").transform.position = cameraPosition;

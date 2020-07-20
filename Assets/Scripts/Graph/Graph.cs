@@ -37,6 +37,7 @@ public class Graph {
                         if (data[e.to].Contains(f)) data[e.to].Remove(f);
                     }
                 }
+                if (data[n].Contains(e)) data[n].Remove(e);
             }
             //data.Remove(n);
         }
@@ -54,12 +55,12 @@ public class Graph {
                 AddEdge(new Edge(crossings[n.x, n.y - 1], n));
                 AddEdge(new Edge(n, crossings[n.x, n.y - 1]));
             }
-            if (n.x < crossings.GetLength(0)-2 && !blockList.Contains(crossings[n.x + 1, n.y]))
+            if (n.x < crossings.GetLength(0)-1 && !blockList.Contains(crossings[n.x + 1, n.y]))
             {
                 AddEdge(new Edge(crossings[n.x + 1, n.y], n));
                 AddEdge(new Edge(n, crossings[n.x + 1, n.y]));
             }
-            if (n.y < crossings.GetLength(1) - 2 && !blockList.Contains(crossings[n.x, n.y+1]))
+            if (n.y < crossings.GetLength(1) - 1 && !blockList.Contains(crossings[n.x, n.y+1]))
             {
                 AddEdge(new Edge(crossings[n.x, n.y+1], n));
                 AddEdge(new Edge(n, crossings[n.x, n.y+1]));
