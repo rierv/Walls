@@ -139,10 +139,13 @@ public class GameManager : MonoBehaviour
                     }
                     else if (!blockRegeneration && blockList.Contains(n))
                     {
+                        
                         Blocks.text = "" + (int.Parse(Blocks.text) + 1);
-                        OutlineNode(n, defaultMaterial);
+                        OutlineNode(n, trackMaterial);
                         g.AddNodeConnections(n, matrix, blockList);
                         blockList.Remove(n);
+                        Edge lockEdge = new Edge(new Node(-1,-1), n);
+                        totalPath.Add(lockEdge);
                     }
                 }
             }
@@ -183,7 +186,7 @@ public class GameManager : MonoBehaviour
                 OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
                 totalPath.Add(path[0]);
                 OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
-                if (path[0].to == matrix[x - 1, y - 1])
+                if (path[0].to == matrix[xEnd, yEnd])
                 {
                     EndButton.SetActive(true);
                     EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
@@ -468,7 +471,6 @@ public class GameManager : MonoBehaviour
         {
             for (int j = 0; j < matrix.GetLength(1); j++)
             {
-                Debug.Log(matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material + "" == o.GetComponent<MeshRenderer>().material + "");
                 if (matrix[i,j].sceneObject.GetComponent<MeshRenderer>().material + ""== o.GetComponent<MeshRenderer>().material+"") matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = defaultMaterial;
 
             }
