@@ -273,7 +273,6 @@ public class GameManager : MonoBehaviour
 
                 //OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
                 delay = (startingDelay / acceleration) * (path[0].weight + 3);
-                Debug.Log(path[0].from.description + " " + path[0].to.description + " " + path[0].weight);
                 yield return new WaitForSeconds(delay);
                 if (!blockList.Contains(path[0].to))
                 {
