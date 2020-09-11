@@ -67,6 +67,8 @@
     <Compile Include="Assets\Scripts\AStar\AStarSquareBasic.cs" />
     <Compile Include="Assets\Scripts\AStar\Animated\AStarSquareAnimated.cs" />
     <Compile Include="Assets\Scripts\AStar\Animated\AStarStepSolver.cs" />
+    <Compile Include="Assets\Scripts\Dijkstra\Animated\DijkstraStepSolver.cs" />
+    <Compile Include="Assets\Scripts\Dijkstra\DijkstraSolver.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Graph\Edge.cs" />
     <Compile Include="Assets\Scripts\Graph\Graph.cs" />

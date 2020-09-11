@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class StartButton : MonoBehaviour
 {
     public Text gridLenght, gridHeight, speed, blocks, badBoost, goodBoost, boost, freeze, acceleration, xStart, yStart, xEnd, yEnd;
-    public Toggle blockRegeneration;
+    public Toggle blockRegeneration, climbing;
     // Start is called before the first frame update
     public void startGame() {
         if (Scenes.parameters == null)
@@ -22,6 +22,7 @@ public class StartButton : MonoBehaviour
             Scenes.setParam("freeze", freeze.text);
             Scenes.setParam("acceleration", acceleration.text);
             Scenes.setParam("blockRegeneration", blockRegeneration.isOn+"");
+            Scenes.setParam("Climbing", climbing.isOn + "");
 
         }
         //Scenes.setParam("badBoost", badBoost.text);

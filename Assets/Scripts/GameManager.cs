@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     public Text Score, Blocks;
     public bool stopAtFirstHit = false;
     public Material visitedMaterial = null, defaultMaterial = null;
-    
+    Node currentNode = null;
     public enum Heuristics { Euclidean, Manhattan, Bisector, FullBisector, Zero };
     public HeuristicFunction[] myHeuristics = { EuclideanEstimator, ManhattanEstimator, BisectorEstimator,
                                                  FullBisectorEstimator, ZeroEstimator };
@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public int x = 10;
     public int y = 10;
     public int speed=5, blocks=5;
+    public bool climbing = false;
     [Range(0f, 1f)] public float edgeProbability = 0.75f;
     public int RandomSeed = 0;
     public Color edgeColor = Color.red;
@@ -28,7 +29,8 @@ public class GameManager : MonoBehaviour
     public Material endMaterial = null;
     public Material boostMaterial = null;
     public Material freezeMaterial = null;
-    public float delay = 0.5f;
+    public Material freezeBlockMaterial = null;
+    public float delay = 0.3f;
     // what to put on the scene, not really meaningful
     public GameObject sceneObject;
     List<Edge> totalPath = new List<Edge>();
@@ -46,7 +48,7 @@ public class GameManager : MonoBehaviour
     List<Node> boostList = new List<Node>();
     List<Node> freezeList = new List<Node>();
     List<Node> blockList = new List<Node>();
-
+    float startingDelay;
     void Start()
     {
         RandomSeed = (int)System.DateTime.Now.Ticks;
@@ -67,19 +69,22 @@ public class GameManager : MonoBehaviour
                 freezeCount = int.Parse(Scenes.getParam("freeze"));
                 acceleration = 1+float.Parse(Scenes.getParam("acceleration"))/1000f;
                 blockRegeneration = bool.Parse(Scenes.getParam("blockRegeneration"));
+                climbing = bool.Parse(Scenes.getParam("Climbing"));
+
 
                 if (boostCount > 0) boost=true;
                 if (freezeCount > 0) freeze = true;
                 if (!blockRegeneration) Blocks.text = "" + blocks;
                 else Blocks.text = "" + 5;
             }
+            startingDelay = delay;
             // create a x * y matrix of nodes (and scene objects)
             // edge weight is now the geometric distance (gap)
             matrix = CreateGrid(sceneObject, x, y, gap);
-
             // create a graph and put random edges inside
             g = new Graph();
             CreateGraph(g, matrix);
+            currentNode = matrix[0, 0];
             if (freeze) insertFreezeBlocks(matrix);
             if (boost) insertBoostBlocks(matrix);
 
@@ -96,8 +101,15 @@ public class GameManager : MonoBehaviour
 
             GameObject.Find("Main Camera").transform.position = cameraPosition;
             // ask A* to solve the problem
-            AStarStepSolver.immediateStop = stopAtFirstHit;
-            AStarStepSolver.Init(g, matrix[xStart, yStart], matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
+            if(boost||climbing)
+            {
+                DijkstraStepSolver.Init(g, matrix[xStart, yStart], matrix[xEnd, yEnd]);
+            }
+            else
+            {
+                AStarStepSolver.immediateStop = stopAtFirstHit;
+                AStarStepSolver.Init(g, matrix[xStart, yStart], matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
+            }
 
             OutlineNode(matrix[xStart, yStart], npcMaterial);
 
@@ -110,8 +122,9 @@ public class GameManager : MonoBehaviour
     {
         if (start && Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended)
         {
-            StartCoroutine(AnimateSolution());
-            if(blockRegeneration) StartCoroutine(BlocksRecovery(10 / blocks));
+            if(boost||climbing) StartCoroutine(AnimateBoostSolution());
+            else StartCoroutine(AnimateSolution());
+            if (blockRegeneration) StartCoroutine(BlocksRecovery(10 / blocks));
             start = false;
         }
         if (Input.touchCount == 1 && Input.GetTouch(0).phase == 0)
@@ -162,6 +175,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator AnimateSolution()
     {
+        Edge[] path=null;
         while (!done) { 
 
             while (AStarStepSolver.Step())
@@ -169,7 +183,9 @@ public class GameManager : MonoBehaviour
                 //OutlineSet(AStarStepSolver.visited, visitedMaterial);
                 //OutlineNode(AStarStepSolver.current, trackMaterial);
             }
-            Edge[] path = AStarStepSolver.solution;
+
+            path = AStarStepSolver.solution;
+            
             // check if there is a solution
             if (path.Length == 0)
             {
@@ -180,12 +196,26 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                if (boost) path = pathToBoost(path, path[0].from);
+                //ClearGridFromVisitedNodes();
+                
+
                 // if yes, outline it
-                ClearGridFromVisitedNodes();
-                OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
-                totalPath.Add(path[0]);
-                OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
+
+                //OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
+                delay = (startingDelay / acceleration) * (path[0].weight+3);
+                Debug.Log(path[0].from.description + " " + path[0].to.description + " " + path[0].weight);
+                yield return new WaitForSeconds(delay);
+                if (!blockList.Contains(path[0].to)) {
+                    totalPath.Add(path[0]);
+                    OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
+                    AStarStepSolver.Init(g, totalPath[totalPath.Count - 1].to, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
+                    currentNode = path[0].to;
+                }
+                else {
+                    Debug.Log("banana");
+                    AStarStepSolver.Init(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
+                }
+
                 if (path[0].to == matrix[xEnd, yEnd])
                 {
                     EndButton.SetActive(true);
@@ -205,13 +235,81 @@ public class GameManager : MonoBehaviour
                 }
 
             }
-            AStarStepSolver.Init(g, totalPath[totalPath.Count-1].to, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
             Score.text = ""+(int.Parse(Score.text) + 1);
-            yield return new WaitForSeconds(delay);
+            
             //step accelerarion
-            delay = delay / acceleration;
+            
         }
     }
+
+    private IEnumerator AnimateBoostSolution()
+    {
+        Edge[] path = null;
+        while (!done)
+        {
+
+            while (DijkstraStepSolver.Step())
+            {
+                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
+                //OutlineNode(AStarStepSolver.current, trackMaterial);
+            }
+
+            path = DijkstraStepSolver.solution;
+
+            // check if there is a solution
+            if (path.Length == 0)
+            {
+                EndButton.SetActive(true);
+                EndButton.GetComponentInChildren<Text>().text = "Sorry, No solution left\nScore: " + Score.text;
+                //UnityEditor.EditorUtility.DisplayDialog("Sorry, No solution", "Score: "+ Score.text, "OK");
+                done = true;
+            }
+            else
+            {
+                //ClearGridFromVisitedNodes();
+
+
+                // if yes, outline it
+
+                //OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
+                delay = (startingDelay / acceleration) * (path[0].weight + 3);
+                Debug.Log(path[0].from.description + " " + path[0].to.description + " " + path[0].weight);
+                yield return new WaitForSeconds(delay);
+                if (!blockList.Contains(path[0].to))
+                {
+                    totalPath.Add(path[0]);
+                    OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
+                    DijkstraStepSolver.Init(g, totalPath[totalPath.Count - 1].to, matrix[xEnd, yEnd]);
+                    currentNode = path[0].to;
+                }
+                else DijkstraStepSolver.Init(g, currentNode, matrix[xEnd, yEnd]);
+
+                if (path[0].to == matrix[xEnd, yEnd])
+                {
+                    EndButton.SetActive(true);
+                    EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
+                    //UnityEditor.EditorUtility.DisplayDialog("Sorry, End of the Run", "Score: " + Score.text, "OK");
+                    done = true;
+                }
+                else if (boostList.Contains(path[0].to))
+                {
+                    StartCoroutine(BoostCoroutine());
+                    boostList.Remove(path[0].to);
+                }
+                else if (freezeList.Contains(path[0].to))
+                {
+                    StartCoroutine(FreezeCoroutine());
+                    freezeList.Remove(path[0].to);
+                }
+
+            }
+            Score.text = "" + (int.Parse(Score.text) + 1);
+
+            //step accelerarion
+
+        }
+    }
+
     public void Restart()
     {
         Scenes.Load("MainMenu");
@@ -240,7 +338,7 @@ public class GameManager : MonoBehaviour
         {
             e.to.sceneObject.GetComponent<MeshRenderer>().material = tm;
         }
-        path[0].from.sceneObject.GetComponent<MeshRenderer>().material = sm;
+        if (path[0].from.sceneObject) path[0].from.sceneObject.GetComponent<MeshRenderer>().material = sm;
         path[path.Length - 1].to.sceneObject.GetComponent<MeshRenderer>().material = em;
     }
 
@@ -281,10 +379,13 @@ public class GameManager : MonoBehaviour
             {
                 matrix[i, j] = new Node(i, j, Instantiate(o));
                 matrix[i, j].sceneObject.name = ""+i+","+j;
+                if (climbing) matrix[i, j].height = (int)Random.Range(1f, 4f);
+                else matrix[i, j].height = 1;
                 matrix[i, j].sceneObject.transform.position =
                     transform.position +
                     transform.right * gap * (i - ((x - 1) / 2f)) +
                     transform.forward * gap * (j - ((y - 1) / 2f));
+                matrix[i, j].sceneObject.transform.localScale = new Vector3 ( 1,matrix[i, j].height*1.5f,1);
                 matrix[i, j].sceneObject.transform.rotation = transform.rotation;
             }
         }
@@ -339,9 +440,9 @@ public class GameManager : MonoBehaviour
         return result.ToArray();
     }
 
-    protected virtual float Distance(Node from, Node to)
+    protected float Distance(Node from, Node to)
     {
-        return 1f;
+        return to.height - from.height +1;
     }
 
     void OnDrawGizmos()
@@ -373,12 +474,14 @@ public class GameManager : MonoBehaviour
             {
                 for (int j = 0; j < matrix.GetLength(1); j++)
                 {
-                    if ((Random.Range(0f, 1f) < 0.005 && boostCount > 0)&&(!freeze||!freezeList.Contains(matrix[i,j])))
+                    if (Random.Range(0f, 1f) < 0.005 && boostCount > 0&&!freezeList.Contains(matrix[i,j])&& !boostList.Contains(matrix[i, j])&&(i!=0||j!=0)&&(i!=matrix.GetLength(0)-1||j!= matrix.GetLength(1)))
                     {
+                        matrix[i, j].height = 1;
+                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.5f, 1);
                         boostCount--;
                         matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = boostMaterial;
                         boostList.Add(matrix[i, j]);
-                        g.changeWeight(matrix[i, j].description, 0);
+                        g.changeWeight(matrix[i, j].description, 1);
                     }
                 }
 
@@ -394,12 +497,14 @@ public class GameManager : MonoBehaviour
             {
                 for (int j = 0; j < matrix.GetLength(1); j++)
                 {
-                    if (Random.Range(0f, 1f) < 0.005 && freezeCount > 0)
+                    if (Random.Range(0f, 1f) < 0.005 && freezeCount > 0 && !freezeList.Contains(matrix[i, j]) && !boostList.Contains(matrix[i, j]) && (i != 0 || j != 0) && (i != matrix.GetLength(0) - 1 || j != matrix.GetLength(1)))
                     {
+                        matrix[i, j].height = 4;
+                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.5f, 1);
                         freezeCount--;
-                        matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = freezeMaterial;
+                        matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = freezeBlockMaterial;
                         freezeList.Add(matrix[i, j]);
-                        g.changeWeight(matrix[i, j].description, 10);
+                        g.changeWeight(matrix[i, j].description, 5);
 
                     }
                 }
@@ -409,59 +514,17 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator BoostCoroutine()
     {
-        delay = delay / 1.6f;
-        yield return new WaitForSeconds(2);
-        delay = delay * 1.6f;
+        startingDelay = startingDelay / 1.6f;
+        yield return new WaitForSeconds(1);
+        startingDelay = startingDelay * 1.6f;
     }
     private IEnumerator FreezeCoroutine()
     {
-        delay = delay * 1.6f;
+        startingDelay = startingDelay * 1.6f;
         yield return new WaitForSeconds(2);
-        delay = delay / 1.6f;
+        startingDelay = startingDelay / 1.6f;
     }
-    public Edge[] pathToBoost(Edge [] path, Node start)
-    {
-        float stepToBoostCount = 0;
-        float stepToEndCount = 0;
-        float min = (path.Length)/2;
-        Node newTarget=null;
-        Edge [] newPath;
-        foreach(Node n in boostList)
-        {
-            stepToBoostCount = 0;
-            stepToEndCount = 0;
-            AStarStepSolver.Init(g, start, n, myHeuristics[(int)heuristicToUse]);
-            while (AStarStepSolver.Step())
-            {
-                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
-            }
-            newPath = AStarStepSolver.solution;
-            stepToBoostCount = AStarStepSolver.solution.Length*0.8f;
-            AStarStepSolver.Init(g, n, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
-            while (AStarStepSolver.Step())
-            {
-                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
-            }
-            stepToEndCount = stepToBoostCount + AStarStepSolver.solution.Length*0.2f;
-            if (stepToEndCount>0 && stepToEndCount < min)
-            {
-                min = stepToEndCount;
-                path = newPath;
-                newTarget = n;
-            }
-        }
-        if (newTarget != null)
-        {
-            AStarStepSolver.Init(g, start, newTarget, myHeuristics[(int)heuristicToUse]);
-            while (AStarStepSolver.Step()) ;
-        }
-        else
-        {
-            AStarStepSolver.Init(g, start, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
-            while (AStarStepSolver.Step()) ;
-        }
-        return path;
-    }
+    
     private void ClearGridFromVisitedNodes()
     {
         GameObject o = new GameObject();
