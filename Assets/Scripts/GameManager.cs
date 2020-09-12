@@ -8,46 +8,25 @@ public class GameManager : MonoBehaviour
     public GameObject EndButton;
     public GameObject Spawner;
     public Text Score, Blocks;
-    public bool stopAtFirstHit = false;
     public Material visitedMaterial = null, defaultMaterial = null;
     Node currentNode = null;
     public enum Heuristics { Euclidean, Manhattan, Bisector, FullBisector, Zero };
-    public HeuristicFunction[] myHeuristics = { EuclideanEstimator, ManhattanEstimator, BisectorEstimator,
-                                                 FullBisectorEstimator, ZeroEstimator };
+    public HeuristicFunction[] myHeuristics = { EuclideanEstimator, ManhattanEstimator, BisectorEstimator, FullBisectorEstimator, ZeroEstimator };
     public Heuristics heuristicToUse = Heuristics.Euclidean;
-    public int x = 10;
-    public int y = 10;
-    public int speed=5, blocks=5;
-    public bool climbing = false;
+    public int x = 10, y = 10, speed=5, blocks=5, RandomSeed = 0;
     [Range(0f, 1f)] public float edgeProbability = 0.75f;
-    public int RandomSeed = 0;
     public Color edgeColor = Color.red;
-    public float gap = 2f;
-    public Material startMaterial = null;
-    public Material trackMaterial = null;
-    public Material npcMaterial = null;
-    public Material endMaterial = null;
-    public Material boostMaterial = null;
-    public Material freezeMaterial = null;
-    public Material freezeBlockMaterial = null;
-    public float delay = 0.3f;
+    public float gap = 2f, delay = 0.3f, acceleration = 1.008f;
+    public Material startMaterial = null, trackMaterial = null, npcMaterial = null, endMaterial = null, boostMaterial = null, freezeMaterial = null, freezeBlockMaterial = null;
     // what to put on the scene, not really meaningful
     public GameObject sceneObject;
     List<Edge> totalPath = new List<Edge>();
     protected Node[,] matrix;
     protected Graph g;
-    bool done = false;
-    bool boost = false;
-    bool freeze = false;
-    int boostCount = 0;
-    int freezeCount = 0;
-    bool start = false;
-    bool blockRegeneration = true;
+    bool done = false, boost = false, freeze = false, start = false, dijkstra = false, blockRegeneration = true, climbing = false, stopAtFirstHit = false;
+    int boostCount = 0, freezeCount = 0;
     private int xStart = 0, yStart = 0, xEnd = 0, yEnd = 0;
-    public float acceleration = 1.008f;
-    List<Node> boostList = new List<Node>();
-    List<Node> freezeList = new List<Node>();
-    List<Node> blockList = new List<Node>();
+    List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>();
     float startingDelay;
     void Start()
     {
@@ -71,7 +50,6 @@ public class GameManager : MonoBehaviour
                 blockRegeneration = bool.Parse(Scenes.getParam("blockRegeneration"));
                 climbing = bool.Parse(Scenes.getParam("Climbing"));
 
-
                 if (boostCount > 0) boost=true;
                 if (freezeCount > 0) freeze = true;
                 if (!blockRegeneration) Blocks.text = "" + blocks;
@@ -85,14 +63,11 @@ public class GameManager : MonoBehaviour
             g = new Graph();
             CreateGraph(g, matrix);
             currentNode = matrix[xStart, yStart];
-            if (freeze) insertFreezeBlocks(matrix);
-            if (boost) insertBoostBlocks(matrix);
+            if (freeze) insertSpecialBlocks(matrix, freezeCount, 4, 12, freezeBlockMaterial);
+            if (boost) insertSpecialBlocks(matrix, boostCount, 1, 1, boostMaterial);
 
             matrix[xEnd, yEnd].sceneObject.GetComponent<MeshRenderer>().material = endMaterial;
-            // initialize randomness, so experiments can be repeated
-            //if (RandomSeed == 0) RandomSeed = (int)System.DateTime.Now.Ticks;
-            //Random.InitState(RandomSeed);
-            //CreateLabyrinth(g, matrix, edgeProbability);
+            
             float xCoord = (matrix[0, 0].sceneObject.transform.position.x + matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x) / 2;
             float zCoord = (matrix[0, 0].sceneObject.transform.position.z + matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z) / 2;
             float yCoord = (Mathf.Max(matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x - matrix[0, 0].sceneObject.transform.position.x,
@@ -100,8 +75,8 @@ public class GameManager : MonoBehaviour
             Vector3 cameraPosition = new Vector3(xCoord,yCoord, zCoord);
 
             GameObject.Find("Main Camera").transform.position = cameraPosition;
-            // ask A* to solve the problem
-            if(boost||climbing)
+
+            if (boost||climbing)
             {
                 DijkstraStepSolver.Init(g, matrix[xStart, yStart], matrix[xEnd, yEnd]);
             }
@@ -110,22 +85,19 @@ public class GameManager : MonoBehaviour
                 AStarStepSolver.immediateStop = stopAtFirstHit;
                 AStarStepSolver.Init(g, matrix[xStart, yStart], matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
             }
-
             OutlineNode(matrix[xStart, yStart], npcMaterial);
-
-
         }
         start = true;
     }
 
     void Update()
     {
-        Spawner.transform.position = Vector3.Lerp(Spawner.transform.position, currentNode.sceneObject.transform.position + Vector3.up * currentNode.height*1.5f, .5f);
+        Spawner.transform.position = Vector3.Lerp(Spawner.transform.position, currentNode.sceneObject.transform.position + Vector3.up * (1.5f + currentNode.height/1.5f), .2f);
 
         if (start && Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended)
         {
-            if(boost||climbing) StartCoroutine(AnimateBoostSolution());
-            else StartCoroutine(AnimateSolution());
+            if(boost||climbing) dijkstra = true;
+            StartCoroutine(AnimateSolution());
             if (blockRegeneration) StartCoroutine(BlocksRecovery(10 / blocks));
             start = false;
         }
@@ -169,6 +141,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     private IEnumerator BlocksRecovery(float pause)
     {
         while (!done)
@@ -180,137 +153,64 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator AnimateSolution()
     {
-        Edge[] path=null;
-        while (!done) { 
-
-            while (AStarStepSolver.Step())
-            {
-                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
-                //OutlineNode(AStarStepSolver.current, trackMaterial);
-            }
-
-            path = AStarStepSolver.solution;
-            
-            // check if there is a solution
-            if (path.Length == 0)
-            {
-                EndButton.SetActive(true);
-                EndButton.GetComponentInChildren<Text>().text= "Sorry, No solution left\nScore: " + Score.text;
-                //UnityEditor.EditorUtility.DisplayDialog("Sorry, No solution", "Score: "+ Score.text, "OK");
-                done = true;
-            }
-            else
-            {
-                //ClearGridFromVisitedNodes();
-                
-
-                // if yes, outline it
-
-                //OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
-                delay = (startingDelay / acceleration) * (path[0].weight+3);
-                Debug.Log(path[0].from.description + " " + path[0].to.description + " " + path[0].weight);
-                yield return new WaitForSeconds(delay);
-                if (!blockList.Contains(path[0].to)) {
-                    totalPath.Add(path[0]);
-                    OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
-                    AStarStepSolver.Init(g, totalPath[totalPath.Count - 1].to, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
-                    currentNode = path[0].to;
-                }
-                else {
-                    Debug.Log("banana");
-                    AStarStepSolver.Init(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
-                }
-
-                if (path[0].to == matrix[xEnd, yEnd])
-                {
-                    EndButton.SetActive(true);
-                    EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
-                    //UnityEditor.EditorUtility.DisplayDialog("Sorry, End of the Run", "Score: " + Score.text, "OK");
-                    done = true;
-                }
-                else if (boostList.Contains(path[0].to))
-                {
-                    StartCoroutine(BoostCoroutine());
-                    boostList.Remove(path[0].to);
-                }
-                else if (freezeList.Contains(path[0].to))
-                {
-                    StartCoroutine(FreezeCoroutine());
-                    freezeList.Remove(path[0].to);
-                }
-
-            }
-            Score.text = ""+(int.Parse(Score.text) + 1);
-            
-            //step accelerarion
-            
-        }
-    }
-
-    private IEnumerator AnimateBoostSolution()
-    {
         Edge[] path = null;
         while (!done)
         {
-
-            while (DijkstraStepSolver.Step())
+            if (dijkstra)
             {
-                //OutlineSet(AStarStepSolver.visited, visitedMaterial);
-                //OutlineNode(AStarStepSolver.current, trackMaterial);
+                while (DijkstraStepSolver.Step()) ;
+                path = DijkstraStepSolver.solution;
             }
-
-            path = DijkstraStepSolver.solution;
-
+            else
+            {
+                while (AStarStepSolver.Step()) ;
+                path = AStarStepSolver.solution;
+            }
             // check if there is a solution
             if (path.Length == 0)
             {
                 EndButton.SetActive(true);
                 EndButton.GetComponentInChildren<Text>().text = "Sorry, No solution left\nScore: " + Score.text;
-                //UnityEditor.EditorUtility.DisplayDialog("Sorry, No solution", "Score: "+ Score.text, "OK");
                 done = true;
             }
             else
             {
-                //ClearGridFromVisitedNodes();
-
-
-                // if yes, outline it
-
-                //OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
                 delay = (startingDelay / acceleration) * (path[0].weight/2 + 3);
                 yield return new WaitForSeconds(delay);
+
                 if (!blockList.Contains(path[0].to))
                 {
                     totalPath.Add(path[0]);
                     OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
-                    DijkstraStepSolver.Init(g, totalPath[totalPath.Count - 1].to, matrix[xEnd, yEnd]);
                     currentNode = path[0].to;
+                    if (dijkstra) DijkstraStepSolver.Init(g, totalPath[totalPath.Count - 1].to, matrix[xEnd, yEnd]);
+                    else AStarStepSolver.Init(g, totalPath[totalPath.Count - 1].to, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
                 }
-                else DijkstraStepSolver.Init(g, currentNode, matrix[xEnd, yEnd]);
+                else
+                {
+                    if (dijkstra) DijkstraStepSolver.Init(g, currentNode, matrix[xEnd, yEnd]);
+                    else AStarStepSolver.Init(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
+                }
 
                 if (path[0].to == matrix[xEnd, yEnd])
                 {
                     EndButton.SetActive(true);
                     EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
-                    //UnityEditor.EditorUtility.DisplayDialog("Sorry, End of the Run", "Score: " + Score.text, "OK");
                     done = true;
                 }
                 else if (boostList.Contains(path[0].to))
                 {
-                    StartCoroutine(BoostCoroutine());
+                    StartCoroutine(ChangeOfSpeedCoroutine(1, 1.6f));
                     boostList.Remove(path[0].to);
                 }
                 else if (freezeList.Contains(path[0].to))
                 {
-                    StartCoroutine(FreezeCoroutine());
+                    StartCoroutine(ChangeOfSpeedCoroutine(2, 1 / 1.6f));
                     freezeList.Remove(path[0].to);
                 }
 
             }
             Score.text = "" + (int.Parse(Score.text) + 1);
-
-            //step accelerarion
-
         }
     }
 
@@ -319,6 +219,96 @@ public class GameManager : MonoBehaviour
         Scenes.Load("MainMenu");
 
     }
+
+    protected virtual Node[,] CreateGrid(GameObject o, int x, int y, float gap)
+    {
+        Node[,] matrix = new Node[x, y];
+        for (int i = 0; i < x; i += 1)
+        {
+            for (int j = 0; j < y; j += 1)
+            {
+                matrix[i, j] = new Node(i, j, Instantiate(o));
+                matrix[i, j].sceneObject.name = ""+i+","+j;
+                if (climbing) matrix[i, j].height = (int)Random.Range(1f, 4f);
+                else matrix[i, j].height = 1;
+                matrix[i, j].sceneObject.transform.position =
+                    transform.position +
+                    transform.right * gap * (i - ((x - 1) / 2f)) +
+                    transform.forward * gap * (j - ((y - 1) / 2f))+
+                    transform.up * -0.65f;
+                matrix[i, j].sceneObject.transform.localScale = new Vector3 ( 1,matrix[i, j].height*1.8f,1);
+                matrix[i, j].sceneObject.transform.rotation = transform.rotation;
+            }
+        }
+        return matrix;
+    }
+
+    protected void CreateGraph(Graph g, Node[,] crossings)
+    {
+        for (int i = 0; i < crossings.GetLength(0); i += 1)
+        {
+            for (int j = 0; j < crossings.GetLength(1); j += 1)
+            {
+                g.AddNode(crossings[i, j]);
+                foreach (Edge e in RandomEdges(crossings, i, j, 1))
+                    g.AddEdge(e);
+            }
+        }
+    }
+
+    protected Edge[] RandomEdges(Node[,] matrix, int x, int y, float threshold)
+    {
+        List<Edge> result = new List<Edge>();
+        if (x != 0 && Random.Range(0f, 1f) <= threshold)
+            result.Add(new Edge(matrix[x, y], matrix[x - 1, y], Distance(matrix[x, y], matrix[x - 1, y])));
+
+        if (y != 0 && Random.Range(0f, 1f) <= threshold)
+            result.Add(new Edge(matrix[x, y], matrix[x, y - 1], Distance(matrix[x, y], matrix[x, y - 1])));
+
+        if (x != (matrix.GetLength(0) - 1) && Random.Range(0f, 1f) <= threshold)
+            result.Add(new Edge(matrix[x, y], matrix[x + 1, y], Distance(matrix[x, y], matrix[x + 1, y])));
+
+        if (y != (matrix.GetLength(1) - 1) && Random.Range(0f, 1f) <= threshold)
+            result.Add(new Edge(matrix[x, y], matrix[x, y + 1], Distance(matrix[x, y], matrix[x, y + 1])));
+
+        return result.ToArray();
+    }
+
+    protected float Distance(Node from, Node to)
+    {
+        return (to.height - from.height +1)*3;
+    }
+
+    void insertSpecialBlocks(Node[,] matrix, int blockCount, int height, int weight, Material material)
+    {
+        while (blockCount > 0)
+        {
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (Random.Range(0f, 1f) < 0.005 && blockCount > 0&&!freezeList.Contains(matrix[i,j])&& !boostList.Contains(matrix[i, j])&&(i!=xStart||j!=yStart)&&(i!=xEnd||j!= yEnd))
+                    {
+                        matrix[i, j].height = height;
+                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.8f, 1);
+                        blockCount--;
+                        matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = material;
+                        boostList.Add(matrix[i, j]);
+                        g.changeWeight(matrix[i, j].description, weight);
+                    }
+                }
+
+            }
+        }
+    }
+
+    private IEnumerator ChangeOfSpeedCoroutine(float time, float coefficient)
+    {
+        startingDelay = startingDelay / coefficient;
+        yield return new WaitForSeconds(time);
+        startingDelay = startingDelay * coefficient;
+    }
+
 
     protected void OutlineNode(Node n, Material m)
     {
@@ -332,7 +322,7 @@ public class GameManager : MonoBehaviour
         set.Remove(matrix[xEnd, yEnd]);
         foreach (Node n in set)
         {
-            if ((!boost||!boostList.Contains(n))&& (!freeze || !freezeList.Contains(n))) n.sceneObject.GetComponent<MeshRenderer>().material = m;
+            if ((!boost || !boostList.Contains(n)) && (!freeze || !freezeList.Contains(n))) n.sceneObject.GetComponent<MeshRenderer>().material = m;
         }
     }
     protected void OutlinePath(Edge[] path, Material sm, Material tm, Material em)
@@ -373,175 +363,4 @@ public class GameManager : MonoBehaviour
     }
 
     protected static float ZeroEstimator(Node from, Node to) { return 0f; }
-
-    protected virtual Node[,] CreateGrid(GameObject o, int x, int y, float gap)
-    {
-        Node[,] matrix = new Node[x, y];
-        for (int i = 0; i < x; i += 1)
-        {
-            for (int j = 0; j < y; j += 1)
-            {
-                matrix[i, j] = new Node(i, j, Instantiate(o));
-                matrix[i, j].sceneObject.name = ""+i+","+j;
-                if (climbing) matrix[i, j].height = (int)Random.Range(1f, 4f);
-                else matrix[i, j].height = 1;
-                matrix[i, j].sceneObject.transform.position =
-                    transform.position +
-                    transform.right * gap * (i - ((x - 1) / 2f)) +
-                    transform.forward * gap * (j - ((y - 1) / 2f))+
-                    transform.up * -0.65f;
-                matrix[i, j].sceneObject.transform.localScale = new Vector3 ( 1,matrix[i, j].height*1.8f,1);
-                matrix[i, j].sceneObject.transform.rotation = transform.rotation;
-            }
-        }
-        return matrix;
-    }
-
-    protected void CreateLabyrinth(Graph g, Node[,] crossings, float threshold)
-    {
-        for (int i = 0; i < crossings.GetLength(0); i += 1)
-        {
-            for (int j = 0; j < crossings.GetLength(1); j += 1)
-            {
-                g.AddNode(crossings[i, j]);
-                foreach (Edge e in RandomEdges(crossings, i, j, threshold))
-                {
-                    g.AddEdge(e);
-                }
-            }
-        }
-    }
-    protected void CreateGraph(Graph g, Node[,] crossings)
-    {
-        for (int i = 0; i < crossings.GetLength(0); i += 1)
-        {
-            for (int j = 0; j < crossings.GetLength(1); j += 1)
-            {
-                g.AddNode(crossings[i, j]);
-                foreach (Edge e in RandomEdges(crossings, i, j, 1))
-                {
-                    g.AddEdge(e);
-                }
-            }
-        }
-    }
-
-
-    protected Edge[] RandomEdges(Node[,] matrix, int x, int y, float threshold)
-    {
-        List<Edge> result = new List<Edge>();
-        if (x != 0 && Random.Range(0f, 1f) <= threshold)
-            result.Add(new Edge(matrix[x, y], matrix[x - 1, y], Distance(matrix[x, y], matrix[x - 1, y])));
-
-        if (y != 0 && Random.Range(0f, 1f) <= threshold)
-            result.Add(new Edge(matrix[x, y], matrix[x, y - 1], Distance(matrix[x, y], matrix[x, y - 1])));
-
-        if (x != (matrix.GetLength(0) - 1) && Random.Range(0f, 1f) <= threshold)
-            result.Add(new Edge(matrix[x, y], matrix[x + 1, y], Distance(matrix[x, y], matrix[x + 1, y])));
-
-        if (y != (matrix.GetLength(1) - 1) && Random.Range(0f, 1f) <= threshold)
-            result.Add(new Edge(matrix[x, y], matrix[x, y + 1], Distance(matrix[x, y], matrix[x, y + 1])));
-
-        return result.ToArray();
-    }
-
-    protected float Distance(Node from, Node to)
-    {
-        return (to.height - from.height +1)*2;
-    }
-
-    void OnDrawGizmos()
-    {
-        if (matrix != null)
-        {
-            Gizmos.color = edgeColor;
-            for (int i = 0; i < x; i += 1)
-            {
-                for (int j = 0; j < y; j += 1)
-                {
-                    foreach (Edge e in g.getConnections(matrix[i, j]))
-                    {
-                        Vector3 from = e.from.sceneObject.transform.position;
-                        Vector3 to = e.to.sceneObject.transform.position;
-                        Gizmos.DrawSphere(from + ((to - from) * .2f), .2f);
-                        Gizmos.DrawLine(from, to);
-                    }
-                }
-            }
-        }
-    }
-    void insertBoostBlocks(Node[,] matrix)
-    {
-        
-        while (boostCount > 0)
-        {
-            for (int i = 0; i < matrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < matrix.GetLength(1); j++)
-                {
-                    if (Random.Range(0f, 1f) < 0.005 && boostCount > 0&&!freezeList.Contains(matrix[i,j])&& !boostList.Contains(matrix[i, j])&&(i!=0||j!=0)&&(i!=matrix.GetLength(0)-1||j!= matrix.GetLength(1)))
-                    {
-                        matrix[i, j].height = 1;
-                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.8f, 1);
-                        boostCount--;
-                        matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = boostMaterial;
-                        boostList.Add(matrix[i, j]);
-                        g.changeWeight(matrix[i, j].description, 1);
-                    }
-                }
-
-            }
-        }
-    }
-    void insertFreezeBlocks(Node[,] matrix)
-    {
-        
-        while (freezeCount > 0)
-        {
-            for (int i = 0; i < matrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < matrix.GetLength(1); j++)
-                {
-                    if (Random.Range(0f, 1f) < 0.005 && freezeCount > 0 && !freezeList.Contains(matrix[i, j]) && !boostList.Contains(matrix[i, j]) && (i != 0 || j != 0) && (i != matrix.GetLength(0) - 1 || j != matrix.GetLength(1)))
-                    {
-                        matrix[i, j].height = 4;
-                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.8f, 1);
-                        freezeCount--;
-                        matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = freezeBlockMaterial;
-                        freezeList.Add(matrix[i, j]);
-                        g.changeWeight(matrix[i, j].description, 8);
-
-                    }
-                }
-
-            }
-        }
-    }
-    private IEnumerator BoostCoroutine()
-    {
-        startingDelay = startingDelay / 1.6f;
-        yield return new WaitForSeconds(1);
-        startingDelay = startingDelay * 1.6f;
-    }
-    private IEnumerator FreezeCoroutine()
-    {
-        startingDelay = startingDelay * 1.6f;
-        yield return new WaitForSeconds(2);
-        startingDelay = startingDelay / 1.6f;
-    }
-    
-    private void ClearGridFromVisitedNodes()
-    {
-        GameObject o = new GameObject();
-        o.AddComponent<MeshRenderer>();
-        o.GetComponent<MeshRenderer>().material = visitedMaterial;
-        for (int i = 0; i < matrix.GetLength(0); i++)
-        {
-            for (int j = 0; j < matrix.GetLength(1); j++)
-            {
-                if (matrix[i,j].sceneObject.GetComponent<MeshRenderer>().material + ""== o.GetComponent<MeshRenderer>().material+"") matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = defaultMaterial;
-
-            }
-        }
-    }
 }
