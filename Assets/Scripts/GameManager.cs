@@ -477,7 +477,7 @@ public class GameManager : MonoBehaviour
                     if (Random.Range(0f, 1f) < 0.005 && boostCount > 0&&!freezeList.Contains(matrix[i,j])&& !boostList.Contains(matrix[i, j])&&(i!=0||j!=0)&&(i!=matrix.GetLength(0)-1||j!= matrix.GetLength(1)))
                     {
                         matrix[i, j].height = 1;
-                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.5f, 1);
+                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.8f, 1);
                         boostCount--;
                         matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = boostMaterial;
                         boostList.Add(matrix[i, j]);
@@ -500,7 +500,7 @@ public class GameManager : MonoBehaviour
                     if (Random.Range(0f, 1f) < 0.005 && freezeCount > 0 && !freezeList.Contains(matrix[i, j]) && !boostList.Contains(matrix[i, j]) && (i != 0 || j != 0) && (i != matrix.GetLength(0) - 1 || j != matrix.GetLength(1)))
                     {
                         matrix[i, j].height = 4;
-                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.5f, 1);
+                        matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height * 1.8f, 1);
                         freezeCount--;
                         matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = freezeBlockMaterial;
                         freezeList.Add(matrix[i, j]);
