@@ -95,13 +95,14 @@ public class Graph {
 	}
     public void changeWeight(String n, float newWeight)
     {
-        foreach (Edge e in data[getNode(n)])
-        {
-            e.weight = newWeight;
-        }
+        
         foreach (Node node in getNodes())
             foreach (Edge e in data[node])
-                if(e.to.description == n) e.weight = newWeight;
+                if (e.to.description == n|| e.from.description == n)
+                {
+                    
+                    e.weight = newWeight;
+                }
         return;
     }
 

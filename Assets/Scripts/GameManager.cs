@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
                 yStart= int.Parse(Scenes.getParam("yStart"))-1;
                 xEnd= int.Parse(Scenes.getParam("xEnd"))-1;
                 yEnd= int.Parse(Scenes.getParam("yEnd"))-1;
-                delay = 1.2f-float.Parse(Scenes.getParam("speed"))/10;
+                delay = 0.35f-float.Parse(Scenes.getParam("speed"))/100;
                 blocks = int.Parse(Scenes.getParam("blocks"));
                 boostCount = int.Parse(Scenes.getParam("boost")) ;
                 freezeCount = int.Parse(Scenes.getParam("freeze"));
@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
             float xCoord = (matrix[0, 0].sceneObject.transform.position.x + matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x) / 2;
             float zCoord = (matrix[0, 0].sceneObject.transform.position.z + matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z) / 2;
             float yCoord = (Mathf.Max(matrix[matrix.GetLength(0) - 1, 0].sceneObject.transform.position.x - matrix[0, 0].sceneObject.transform.position.x,
-                 matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z - matrix[0, 0].sceneObject.transform.position.z)/3.5f*-Mathf.Tan(30)/2f)+15;
+                 matrix[0, matrix.GetLength(1) - 1].sceneObject.transform.position.z - matrix[0, 0].sceneObject.transform.position.z)/3.5f*-Mathf.Tan(30)/2f)+18;
             Vector3 cameraPosition = new Vector3(xCoord,yCoord, zCoord);
 
             GameObject.Find("Main Camera").transform.position = cameraPosition;
@@ -272,7 +272,7 @@ public class GameManager : MonoBehaviour
                 // if yes, outline it
 
                 //OutlineSet(AStarStepSolver.solutionNodes, visitedMaterial);
-                delay = (startingDelay / acceleration) * (path[0].weight + 3);
+                delay = (startingDelay / acceleration) * (path[0].weight/2 + 3);
                 yield return new WaitForSeconds(delay);
                 if (!blockList.Contains(path[0].to))
                 {
@@ -383,8 +383,9 @@ public class GameManager : MonoBehaviour
                 matrix[i, j].sceneObject.transform.position =
                     transform.position +
                     transform.right * gap * (i - ((x - 1) / 2f)) +
-                    transform.forward * gap * (j - ((y - 1) / 2f));
-                matrix[i, j].sceneObject.transform.localScale = new Vector3 ( 1,matrix[i, j].height*1.5f,1);
+                    transform.forward * gap * (j - ((y - 1) / 2f))+
+                    transform.up * -0.65f;
+                matrix[i, j].sceneObject.transform.localScale = new Vector3 ( 1,matrix[i, j].height*1.8f,1);
                 matrix[i, j].sceneObject.transform.rotation = transform.rotation;
             }
         }
@@ -441,7 +442,7 @@ public class GameManager : MonoBehaviour
 
     protected float Distance(Node from, Node to)
     {
-        return to.height - from.height +1;
+        return (to.height - from.height +1)*2;
     }
 
     void OnDrawGizmos()
@@ -503,7 +504,7 @@ public class GameManager : MonoBehaviour
                         freezeCount--;
                         matrix[i, j].sceneObject.GetComponent<MeshRenderer>().material = freezeBlockMaterial;
                         freezeList.Add(matrix[i, j]);
-                        g.changeWeight(matrix[i, j].description, 5);
+                        g.changeWeight(matrix[i, j].description, 8);
 
                     }
                 }
