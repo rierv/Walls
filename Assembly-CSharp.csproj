@@ -70,6 +70,12 @@
     <Compile Include="Assets\Scripts\AndroidTouch.cs" />
     <Compile Include="Assets\Scripts\Dijkstra\Animated\DijkstraStepSolver.cs" />
     <Compile Include="Assets\Scripts\Dijkstra\DijkstraSolver.cs" />
+    <Compile Include="Assets\Scripts\Flocking\BoidBlending.cs" />
+    <Compile Include="Assets\Scripts\Flocking\BoidShared.cs" />
+    <Compile Include="Assets\Scripts\Flocking\BoidSpawner.cs" />
+    <Compile Include="Assets\Scripts\Flocking\Delegates\BoidAlign.cs" />
+    <Compile Include="Assets\Scripts\Flocking\Delegates\BoidCohesion.cs" />
+    <Compile Include="Assets\Scripts\Flocking\Delegates\BoidSeparation.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Graph\Edge.cs" />
     <Compile Include="Assets\Scripts\Graph\Graph.cs" />

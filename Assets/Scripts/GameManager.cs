@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public GameObject EndButton;
-
+    public GameObject Spawner;
     public Text Score, Blocks;
     public bool stopAtFirstHit = false;
     public Material visitedMaterial = null, defaultMaterial = null;
@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
             // create a graph and put random edges inside
             g = new Graph();
             CreateGraph(g, matrix);
-            currentNode = matrix[0, 0];
+            currentNode = matrix[xStart, yStart];
             if (freeze) insertFreezeBlocks(matrix);
             if (boost) insertBoostBlocks(matrix);
 
@@ -120,6 +120,8 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        Spawner.transform.position = Vector3.Lerp(Spawner.transform.position, currentNode.sceneObject.transform.position + Vector3.up * currentNode.height*1.5f, .5f);
+
         if (start && Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended)
         {
             if(boost||climbing) StartCoroutine(AnimateBoostSolution());
@@ -139,26 +141,29 @@ public class GameManager : MonoBehaviour
                     bool found=false;
                     GameObject touchedObject = hit.transform.gameObject;
                     Node n = g.getNode(touchedObject.name);
-                    foreach (Edge e in totalPath)
+                    if (n != null)
                     {
-                        if (e.from == n || e.to == n) found = true;
-                    }
-                    if (!found&&(!boost||!boostList.Contains(n))&& (!freeze || !freezeList.Contains(n))&&!blockList.Contains(n) && int.Parse(Blocks.text) > 0)
-                    {
-                        Blocks.text = "" + (int.Parse(Blocks.text) - 1);
-                        OutlineNode(n, startMaterial);
-                        g.RemoveNodeConnections(n);
-                        blockList.Add(n);
-                    }
-                    else if (!blockRegeneration && blockList.Contains(n))
-                    {
-                        
-                        Blocks.text = "" + (int.Parse(Blocks.text) + 1);
-                        OutlineNode(n, trackMaterial);
-                        g.AddNodeConnections(n, matrix, blockList);
-                        blockList.Remove(n);
-                        Edge lockEdge = new Edge(new Node(-1,-1), n);
-                        totalPath.Add(lockEdge);
+                        foreach (Edge e in totalPath)
+                        {
+                            if (e.from == n || e.to == n) found = true;
+                        }
+                        if (!found && (!boost || !boostList.Contains(n)) && (!freeze || !freezeList.Contains(n)) && !blockList.Contains(n) && int.Parse(Blocks.text) > 0 &&n!=currentNode)
+                        {
+                            Blocks.text = "" + (int.Parse(Blocks.text) - 1);
+                            OutlineNode(n, startMaterial);
+                            g.RemoveNodeConnections(n);
+                            blockList.Add(n);
+                        }
+                        else if (!blockRegeneration && blockList.Contains(n))
+                        {
+
+                            Blocks.text = "" + (int.Parse(Blocks.text) + 1);
+                            OutlineNode(n, trackMaterial);
+                            g.AddNodeConnections(n, matrix, blockList);
+                            blockList.Remove(n);
+                            Edge lockEdge = new Edge(new Node(-1, -1), n);
+                            totalPath.Add(lockEdge);
+                        }
                     }
                 }
             }
