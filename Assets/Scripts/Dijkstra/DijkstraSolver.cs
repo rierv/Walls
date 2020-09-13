@@ -1,9 +1,11 @@
-﻿
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class DijkstraSolver {
+public class DijkstraSolver : MonoBehaviour {
 	
 	// two set of nodes (1)
 
@@ -43,8 +45,8 @@ public class DijkstraSolver {
 
 			// assign weight and predecessor to all neighbors (4)
 			foreach (Edge e in g.getConnections(current)) {
-				if (status[current].distance + e.weight < status[e.to].distance) {
-					NodeExtension ne = new NodeExtension();
+                if (status[current].distance + e.weight < status[e.to].distance) {
+                    NodeExtension ne = new NodeExtension();
 					ne.distance = status[current].distance + e.weight;
 					ne.predecessor = e;
 					status[e.to] = ne;

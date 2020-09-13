@@ -131,6 +131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 279426669}
   - component: {fileID: 279426668}
+  - component: {fileID: 279426670}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -154,7 +155,6 @@ MonoBehaviour:
   Spawner: {fileID: 1677784264}
   Score: {fileID: 1176924866}
   Blocks: {fileID: 1046165662}
-  stopAtFirstHit: 1
   visitedMaterial: {fileID: 2100000, guid: c441c10bce6124f75906aa984bc49b6e, type: 2}
   defaultMaterial: {fileID: 2100000, guid: 2d31771e07a1734489e10efb703af10e, type: 2}
   heuristicToUse: 0
@@ -162,11 +162,12 @@ MonoBehaviour:
   y: 15
   speed: 8
   blocks: 5
-  climbing: 0
-  edgeProbability: 0.9
   RandomSeed: 0
+  edgeProbability: 0.9
   edgeColor: {r: 1, g: 0, b: 0, a: 1}
   gap: 1.75
+  delay: 0.1
+  acceleration: 1.008
   startMaterial: {fileID: 2100000, guid: 409f80573f4a04dde9f006374666accf, type: 2}
   trackMaterial: {fileID: 2100000, guid: 2ffd7958ed7334a3aa4b46ff03490521, type: 2}
   npcMaterial: {fileID: 2100000, guid: 14cf3ee727fd644978dcfc83119390e7, type: 2}
@@ -174,9 +175,7 @@ MonoBehaviour:
   boostMaterial: {fileID: 2100000, guid: a193cae4bf10a024386c9f7558d0ceaf, type: 2}
   freezeMaterial: {fileID: 2100000, guid: 2d31771e07a1734489e10efb703af10e, type: 2}
   freezeBlockMaterial: {fileID: 2100000, guid: b4f471b6417caab4289f033840f94830, type: 2}
-  delay: 0.1
   sceneObject: {fileID: 194796, guid: 525d5e70b7dab4e93a6d553695d62354, type: 3}
-  acceleration: 1.008
 --- !u!4 &279426669
 Transform:
   m_ObjectHideFlags: 0
@@ -191,6 +190,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &279426670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 279426667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3fe819f6eaf94946a9ceefd8b96108f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &390000844
 GameObject:
   m_ObjectHideFlags: 0
@@ -1166,12 +1177,12 @@ PrefabInstance:
     - target: {fileID: 4935679911011385689, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
       propertyPath: _BoidSpeed
-      value: 2
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 4935679911011385689, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
       propertyPath: _SeparationComponent
-      value: 0.911
+      value: 0.941
       objectReference: {fileID: 0}
     - target: {fileID: 4935679911011385689, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
@@ -1186,7 +1197,7 @@ PrefabInstance:
     - target: {fileID: 4935679911011385689, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
       propertyPath: _AlignComponent
-      value: 0.45
+      value: 0.36
       objectReference: {fileID: 0}
     - target: {fileID: 4935679911011385690, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}

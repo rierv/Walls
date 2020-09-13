@@ -63,12 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\AStar\AStarSolver.cs" />
-    <Compile Include="Assets\Scripts\AStar\AStarSquare.cs" />
-    <Compile Include="Assets\Scripts\AStar\AStarSquareBasic.cs" />
-    <Compile Include="Assets\Scripts\AStar\Animated\AStarSquareAnimated.cs" />
-    <Compile Include="Assets\Scripts\AStar\Animated\AStarStepSolver.cs" />
     <Compile Include="Assets\Scripts\AndroidTouch.cs" />
-    <Compile Include="Assets\Scripts\Dijkstra\Animated\DijkstraStepSolver.cs" />
     <Compile Include="Assets\Scripts\Dijkstra\DijkstraSolver.cs" />
     <Compile Include="Assets\Scripts\Flocking\BoidBlending.cs" />
     <Compile Include="Assets\Scripts\Flocking\BoidShared.cs" />

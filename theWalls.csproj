@@ -610,10 +610,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\AStar\AStarSolver.cs" />
-    <Compile Include="Assets\Scripts\AStar\AStarSquare.cs" />
-    <Compile Include="Assets\Scripts\AStar\AStarSquareBasic.cs" />
-    <Compile Include="Assets\Scripts\AStar\Animated\AStarSquareAnimated.cs" />
-    <Compile Include="Assets\Scripts\AStar\Animated\AStarStepSolver.cs" />
+    <Compile Include="Assets\Scripts\AndroidTouch.cs" />
+    <Compile Include="Assets\Scripts\Dijkstra\DijkstraSolver.cs" />
+    <Compile Include="Assets\Scripts\Flocking\BoidBlending.cs" />
+    <Compile Include="Assets\Scripts\Flocking\BoidShared.cs" />
+    <Compile Include="Assets\Scripts\Flocking\BoidSpawner.cs" />
+    <Compile Include="Assets\Scripts\Flocking\Delegates\BoidAlign.cs" />
+    <Compile Include="Assets\Scripts\Flocking\Delegates\BoidCohesion.cs" />
+    <Compile Include="Assets\Scripts\Flocking\Delegates\BoidSeparation.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Graph\Edge.cs" />
     <Compile Include="Assets\Scripts\Graph\Graph.cs" />
@@ -621,6 +625,7 @@
     <Compile Include="Assets\Scripts\Graph\TileGraph.cs" />
     <Compile Include="Assets\Scripts\Scenes.cs" />
     <Compile Include="Assets\Scripts\UI\ExitButton.cs" />
+    <Compile Include="Assets\Scripts\UI\LimitedValueManager.cs" />
     <Compile Include="Assets\Scripts\UI\StartButton.cs" />
     <Compile Include="Assets\Scripts\UI\ValueManager.cs" />
   </ItemGroup>

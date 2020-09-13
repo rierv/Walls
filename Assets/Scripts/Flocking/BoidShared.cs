@@ -47,9 +47,11 @@ public class BoidShared : MonoBehaviour {
             SeparationComponent = _SeparationComponent = s;
         }
 
-        if (Input.touchCount == 1 && Input.GetTouch(0).phase == 0)
+        if (((Input.touchCount == 1 && Input.GetTouch(0).phase == 0)|| Input.GetMouseButtonDown(0)))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            Ray ray;
+            if (Input.touchCount == 1 && Input.GetTouch(0).phase == 0) ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            else ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             Debug.DrawRay(ray.origin, ray.direction * 100, Color.yellow, 100f);
             if (Physics.Raycast(ray, out hit))
