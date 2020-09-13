@@ -86,7 +86,8 @@ public class GameManager : MonoBehaviour
         Spawner.transform.position = Vector3.Lerp(Spawner.transform.position, currentNode.sceneObject.transform.position + Vector3.up * (1.5f + currentNode.height/1.5f), .2f);
         if (start && ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended) || Input.GetMouseButtonDown(0)))
         {
-            if(boost||climbing) dijkstra = true;
+            if (boost || climbing) heuristicToUse = Heuristics.Zero;
+            else heuristicToUse = Heuristics.Euclidean;
             StartCoroutine(AnimateSolution());
             if (blockRegeneration) StartCoroutine(BlocksRecovery(10 / blocks));
             start = false;
@@ -148,12 +149,7 @@ public class GameManager : MonoBehaviour
         Edge[] path = null;
         while (!done)
         {
-            if (dijkstra)
-                path = DijkstraSolver.Solve(g, currentNode, matrix[xEnd, yEnd]);
-                
-            else
-                path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
-                
+            path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
             // check if there is a solution
             if (path.Length == 0)
             {
@@ -258,7 +254,8 @@ public class GameManager : MonoBehaviour
 
     void insertSpecialBlocks(Node[,] matrix, int blockCount, int height, int weight, Material material, List<Node> specialList)
     {
-        while (blockCount > 0)
+        int stop = 0;
+        while (blockCount > 0 && stop < 500)
         {
             for (int i = 0; i < matrix.GetLength(0); i++)
             {
@@ -282,6 +279,7 @@ public class GameManager : MonoBehaviour
                 }
 
             }
+            stop++;
         }
     }
 
