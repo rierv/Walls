@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     List<Edge> totalPath = new List<Edge>();
     protected Node[,] matrix;
     public Graph g;
-    bool done = false, boost = false, freeze = false, start = false, dijkstra = false, blockRegeneration = true, climbing = false, stopAtFirstHit = false;
+    bool done = false, boost = false, freeze = false, start = false, blockRegeneration = true, climbing = false;
     int boostCount = 0, freezeCount = 0;
     private int xStart = 0, yStart = 0, xEnd = 0, yEnd = 0;
     List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>();

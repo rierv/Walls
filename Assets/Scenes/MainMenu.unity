@@ -3168,7 +3168,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: DISTURBING FLOCK
+  m_Text: BOTHERING FLOCK
 --- !u!222 &564852009
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7106,7 +7106,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: GRID LENGHT
+  m_Text: GRID LENGTH
 --- !u!222 &1538458208
 CanvasRenderer:
   m_ObjectHideFlags: 0

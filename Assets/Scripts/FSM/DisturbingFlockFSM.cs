@@ -85,7 +85,6 @@ public class DisturbingFlockFSM : MonoBehaviour
     private IEnumerator Touched()
     {
         touched = true;
-        StartCoroutine(GetComponent<BoidShared>().Touched(1, 1.5f, 2.5f));
         yield return new WaitForSeconds(5);
         touched = false;
     }
