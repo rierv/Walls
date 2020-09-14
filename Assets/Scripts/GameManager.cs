@@ -149,6 +149,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator AnimateSolution()
     {
         Edge[] path = null;
+        int Found = 1;
         while (!done)
         {
             path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
@@ -161,15 +162,18 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                delay = Found*(startingDelay / acceleration) * (path[0].weight);
+                yield return new WaitForSeconds(delay);
                 if (!blockList.Contains(path[0].to))
                 {
+                    Found = 1;
                     Score.text = "" + (int.Parse(Score.text) + 1);
                     totalPath.Add(path[0]);
                     OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
                     currentNode = path[0].to;
                 }
-                delay = (startingDelay / acceleration) * (path[0].weight);
-                yield return new WaitForSeconds(delay);
+                else Found = 0;
+
                 if (path[0].to == matrix[xEnd, yEnd])
                 {
                     EndButton.SetActive(true);
