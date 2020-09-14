@@ -25,6 +25,8 @@ public class BoidShared : MonoBehaviour {
 
     bool done = true;
 
+    public int newSize = 30;
+
 	private void Start () {
 		OnValidate ();
 	}
@@ -59,24 +61,24 @@ public class BoidShared : MonoBehaviour {
                 if ( hit.collider != null&&hit.collider.gameObject==this.gameObject  && done)
                 {
                     done = false;
-                    StartCoroutine(Touched());
+                    StartCoroutine(Touched(4, 4, .6f));
                 }
             }
         }
     }
-    private IEnumerator Touched()
+    public IEnumerator Touched(float speed, float division, float time)
     {
         
-        GetComponent<BoidSpawner>().UpdateRadius(30);
-        BoidSpeed *= 4;
-        CohesionComponent /= 4;
-        SeparationComponent *= 4;
-        yield return new WaitForSeconds(.6f);
+        GetComponent<BoidSpawner>().UpdateRadius(newSize);
+        BoidSpeed *= speed;
+        CohesionComponent /= division;
+        SeparationComponent *= division;
+        yield return new WaitForSeconds(time);
         GetComponent<BoidSpawner>().UpdateRadius(GetComponent<BoidSpawner>().radius);
-        yield return new WaitForSeconds(.6f);
-        BoidSpeed /= 4;
-        CohesionComponent *= 4;
-        SeparationComponent /= 4;
+        yield return new WaitForSeconds(time);
+        BoidSpeed /= speed;
+        CohesionComponent *= division;
+        SeparationComponent /= division;
         done = true;
         
     }

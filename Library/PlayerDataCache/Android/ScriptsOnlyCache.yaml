@@ -8,6 +8,7 @@ ScriptsOnlyBuild:
     - BoidSeparation
     - BoidShared
     - BoidSpawner
+    - DisturbingFlockFSM
     - ExitButton
     - GameManager
     - LimitedValueManager
@@ -94,9 +95,11 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 12968}
     - Class: 114
-      Script: {instanceID: 13000}
+      Script: {instanceID: 13020}
     - Class: 114
-      Script: {instanceID: 13022}
+      Script: {instanceID: 14632}
+    - Class: 114
+      Script: {instanceID: 19496}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -297,7 +300,7 @@ ScriptsOnlyBuild:
     className: LayoutElement
   - hash:
       serializedVersion: 2
-      Hash: b994171ac9109092602a0dd0cf7abc34
+      Hash: a1e13e2039d4e363b9410057fad64e27
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: BoidShared
@@ -465,7 +468,7 @@ ScriptsOnlyBuild:
     className: VerticalLayoutGroup
   - hash:
       serializedVersion: 2
-      Hash: 09edecba28955212a70b05c849d335d8
+      Hash: 3d2c5993e653b61b7ccd7358095ea0b4
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: StartButton
@@ -555,7 +558,7 @@ ScriptsOnlyBuild:
     className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
-      Hash: 7bfa9a4b49d844be2cc2f028a48ce9fa
+      Hash: de351454b2214eda5b98154567effaa5
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager
@@ -667,6 +670,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
+  - hash:
+      serializedVersion: 2
+      Hash: 499353f163e8bc735079eb98997571af
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: DisturbingFlockFSM
   platform: 13
   scenePathNames:
   - Assets/Scenes/MainMenu.unity

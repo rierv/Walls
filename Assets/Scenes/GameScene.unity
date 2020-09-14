@@ -153,6 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EndButton: {fileID: 1335292453}
   Spawner: {fileID: 1677784264}
+  DisturbingSpawner: {fileID: 102624940047911056}
   Score: {fileID: 1176924866}
   Blocks: {fileID: 1046165662}
   visitedMaterial: {fileID: 2100000, guid: c441c10bce6124f75906aa984bc49b6e, type: 2}
@@ -1109,6 +1110,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spawner
       objectReference: {fileID: 0}
+    - target: {fileID: 4935679911011385670, guid: 9131367d46d820f45aaa8fb1026695a5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4935679911011385671, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
       propertyPath: size
@@ -1280,3 +1286,101 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2107543077}
   m_CullTransparentMesh: 0
+--- !u!135 &102624940047911052
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102624940047911056}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &102624940047911054
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102624940047911056}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 30.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &102624940047911055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102624940047911056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6d13bc2d4770403bb1f0fb9a4ee7bff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _BoidFOV: 0.5
+  _BoidSpeed: 1.6
+  _AlignComponent: 0.36
+  _CohesionComponent: 0.832
+  _SeparationComponent: 0.941
+  breath: 0
+  amplitude: 0.05
+  speed: 1
+  newSize: 30
+--- !u!1 &102624940047911056
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 102624940047911054}
+  - component: {fileID: 102624940047911057}
+  - component: {fileID: 102624940047911055}
+  - component: {fileID: 102624940047911058}
+  - component: {fileID: 102624940047911052}
+  m_Layer: 0
+  m_Name: ObstacleFlock
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &102624940047911057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102624940047911056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49094800a2ff144d88e61c58d83c52bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 1
+  radius: 0.0001
+  count: 50
+  boid: {fileID: 1456052118041776, guid: 316d35d8072bb4951929dbe08bb8e675, type: 3}
+--- !u!114 &102624940047911058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102624940047911056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7278633198941549a31ebe0708e745e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reactionTime: 0.8
+  switchTime: 0.8

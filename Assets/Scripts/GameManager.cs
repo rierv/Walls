@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public GameObject EndButton;
-    public GameObject Spawner;
+    public GameObject Spawner, DisturbingSpawner;
     public Text Score, Blocks;
     public Material visitedMaterial = null, defaultMaterial = null;
     Node currentNode = null;
@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     public GameObject sceneObject;
     List<Edge> totalPath = new List<Edge>();
     protected Node[,] matrix;
-    protected Graph g;
+    public Graph g;
     bool done = false, boost = false, freeze = false, start = false, dijkstra = false, blockRegeneration = true, climbing = false, stopAtFirstHit = false;
     int boostCount = 0, freezeCount = 0;
     private int xStart = 0, yStart = 0, xEnd = 0, yEnd = 0;
@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
                 acceleration = 1+float.Parse(Scenes.getParam("acceleration"))/1000f;
                 blockRegeneration = bool.Parse(Scenes.getParam("blockRegeneration"));
                 climbing = bool.Parse(Scenes.getParam("Climbing"));
+                if(bool.Parse(Scenes.getParam("DisturbingF"))) DisturbingSpawner.SetActive(true);
+                if (bool.Parse(Scenes.getParam("DecorativeF"))) Spawner.SetActive(true);
 
                 if (boostCount > 0) boost=true;
                 if (freezeCount > 0) freeze = true;
@@ -159,9 +161,6 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                delay = (startingDelay / acceleration) * (path[0].weight/2 + 3);
-                yield return new WaitForSeconds(delay);
-
                 if (!blockList.Contains(path[0].to))
                 {
                     Score.text = "" + (int.Parse(Score.text) + 1);
@@ -169,7 +168,8 @@ public class GameManager : MonoBehaviour
                     OutlinePath(totalPath.ToArray(), trackMaterial, trackMaterial, npcMaterial);
                     currentNode = path[0].to;
                 }
-
+                delay = (startingDelay / acceleration) * (path[0].weight);
+                yield return new WaitForSeconds(delay);
                 if (path[0].to == matrix[xEnd, yEnd])
                 {
                     EndButton.SetActive(true);
