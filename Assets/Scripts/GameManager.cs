@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour
     public Heuristics heuristicToUse = Heuristics.Euclidean;
     public int x = 10, y = 10, speed=5, blocks=5, RandomSeed = 0;
     [Range(0f, 1f)] public float edgeProbability = 0.75f;
-    public Color edgeColor = Color.red;
     public float gap = 2f, delay = 0.3f, acceleration = 1.008f;
     public Material startMaterial = null, trackMaterial = null, npcMaterial = null, endMaterial = null, boostMaterial = null, freezeMaterial = null, freezeBlockMaterial = null;
     // what to put on the scene, not really meaningful
@@ -59,7 +58,7 @@ public class GameManager : MonoBehaviour
                 if (!blockRegeneration) Blocks.text = "" + blocks;
                 else Blocks.text = "" + 5;
             }
-            startingDelay = delay;
+            startingDelay = delay/2;
             // create a x * y matrix of nodes (and scene objects)
             // edge weight is now the geometric distance (gap)
             matrix = CreateGrid(sceneObject, x, y, gap);
@@ -164,7 +163,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                delay = Found*(startingDelay / acceleration) + (path[0].weight - heightLevels)/6;
+                delay = Found*(startingDelay / acceleration) * (path[0].weight- heightLevels + 5)/2;
                 yield return new WaitForSeconds(delay);
                 if (!blockList.Contains(path[0].to))
                 {
