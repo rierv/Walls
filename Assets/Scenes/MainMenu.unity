@@ -8279,7 +8279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   min: 1
-  max: 25
+  max: 30
 --- !u!114 &1774787730
 MonoBehaviour:
   m_ObjectHideFlags: 0

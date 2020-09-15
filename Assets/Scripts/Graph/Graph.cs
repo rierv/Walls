@@ -41,39 +41,7 @@ public class Graph {
             //data.Remove(n);
         }
     }
-    public void AddNodeConnections(Node n, Node[,] crossings, List<Node> blockList)
-    {
-        if (data.ContainsKey(n))
-        {
-            if (n.x > 0 && !blockList.Contains(crossings[n.x - 1, n.y])) {
-                AddEdge(new Edge(crossings[n.x - 1, n.y], n, Distance(crossings[n.x-1, n.y], crossings[n.x, n.y])));
-                AddEdge(new Edge(n, crossings[n.x - 1, n.y], Distance(crossings[n.x, n.y], crossings[n.x-1, n.y])));
-            }
-            if (n.y > 0 && !blockList.Contains(crossings[n.x, n.y - 1]))
-            {
-                AddEdge(new Edge(crossings[n.x, n.y - 1], n, Distance(crossings[n.x, n.y-1], crossings[n.x, n.y])));
-                AddEdge(new Edge(n, crossings[n.x, n.y - 1], Distance(crossings[n.x, n.y], crossings[n.x, n.y - 1])));
-            }
-            if (n.x < crossings.GetLength(0) - 1 && !blockList.Contains(crossings[n.x + 1, n.y]))
-            {
-                AddEdge(new Edge(crossings[n.x + 1, n.y], n, Distance(crossings[n.x+1, n.y], crossings[n.x, n.y])));
-                AddEdge(new Edge(n, crossings[n.x + 1, n.y], Distance(crossings[n.x, n.y], crossings[n.x+1, n.y])));
-            }
-            if (n.y < crossings.GetLength(1) - 1 && !blockList.Contains(crossings[n.x, n.y + 1]))
-            {
-                AddEdge(new Edge(crossings[n.x, n.y + 1], n, Distance(crossings[n.x, n.y+1], crossings[n.x, n.y])));
-                AddEdge(new Edge(n, crossings[n.x, n.y + 1], Distance(crossings[n.x, n.y], crossings[n.x, n.y + 1])));
-            }
-
-            //data.Remove(n);
-        }
-    }
-
-
-    protected float Distance(Node from, Node to)
-    {
-        return to.height - from.height + 5;
-    }
+    
 
     public Edge EdgeTo (Node from, Node to)
     {

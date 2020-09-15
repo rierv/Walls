@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
                 yStart= int.Parse(Scenes.getParam("yStart"))-1;
                 xEnd= int.Parse(Scenes.getParam("xEnd"))-1;
                 yEnd= int.Parse(Scenes.getParam("yEnd"))-1;
-                delay = 0.35f-float.Parse(Scenes.getParam("speed"))/100;
+                delay = 1f-float.Parse(Scenes.getParam("speed"))/35;
                 blocks = int.Parse(Scenes.getParam("blocks"));
                 boostCount = int.Parse(Scenes.getParam("boost")) ;
                 freezeCount = int.Parse(Scenes.getParam("freeze"));
@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
 
                             Blocks.text = "" + (int.Parse(Blocks.text) + 1);
                             OutlineNode(n, trackMaterial);
-                            g.AddNodeConnections(n, matrix, blockList);
+                            AddNodeConnections(n, matrix, blockList);
                             blockList.Remove(n);
                             Edge lockEdge = new Edge(new Node(-1, -1), n);
                             totalPath.Add(lockEdge);
@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                delay = Found*(startingDelay / acceleration) * (path[0].weight);
+                delay = Found*(startingDelay / acceleration) + (path[0].weight - heightLevels)/6;
                 yield return new WaitForSeconds(delay);
                 if (!blockList.Contains(path[0].to))
                 {
@@ -256,7 +256,7 @@ public class GameManager : MonoBehaviour
 
     protected float Distance(Node from, Node to)
     {
-        return to.height - from.height + 5;
+        return to.height - from.height + 1 + heightLevels;
     }
 
     void insertSpecialBlocks(Node[,] matrix, int blockCount, int height, int weight, Material material, List<Node> specialList)
@@ -297,6 +297,31 @@ public class GameManager : MonoBehaviour
         startingDelay = startingDelay * coefficient;
     }
 
+    public void AddNodeConnections(Node n, Node[,] crossings, List<Node> blockList)
+    {
+        
+        if (n.x > 0 && !blockList.Contains(crossings[n.x - 1, n.y]))
+        {
+            g.AddEdge(new Edge(crossings[n.x - 1, n.y], n, Distance(crossings[n.x - 1, n.y], crossings[n.x, n.y])));
+            g.AddEdge(new Edge(n, crossings[n.x - 1, n.y], Distance(crossings[n.x, n.y], crossings[n.x - 1, n.y])));
+        }
+        if (n.y > 0 && !blockList.Contains(crossings[n.x, n.y - 1]))
+        {
+            g.AddEdge(new Edge(crossings[n.x, n.y - 1], n, Distance(crossings[n.x, n.y - 1], crossings[n.x, n.y])));
+            g.AddEdge(new Edge(n, crossings[n.x, n.y - 1], Distance(crossings[n.x, n.y], crossings[n.x, n.y - 1])));
+        }
+        if (n.x < crossings.GetLength(0) - 1 && !blockList.Contains(crossings[n.x + 1, n.y]))
+        {
+            g.AddEdge(new Edge(crossings[n.x + 1, n.y], n, Distance(crossings[n.x + 1, n.y], crossings[n.x, n.y])));
+            g.AddEdge(new Edge(n, crossings[n.x + 1, n.y], Distance(crossings[n.x, n.y], crossings[n.x + 1, n.y])));
+        }
+        if (n.y < crossings.GetLength(1) - 1 && !blockList.Contains(crossings[n.x, n.y + 1]))
+        {
+            g.AddEdge(new Edge(crossings[n.x, n.y + 1], n, Distance(crossings[n.x, n.y + 1], crossings[n.x, n.y])));
+            g.AddEdge(new Edge(n, crossings[n.x, n.y + 1], Distance(crossings[n.x, n.y], crossings[n.x, n.y + 1])));
+        }
+            
+    }
 
     protected void OutlineNode(Node n, Material m)
     {
