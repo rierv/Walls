@@ -472,7 +472,7 @@ ScriptsOnlyBuild:
     className: VerticalLayoutGroup
   - hash:
       serializedVersion: 2
-      Hash: 3d2c5993e653b61b7ccd7358095ea0b4
+      Hash: b3ddcd303050a387982142d1840dd8ab
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: StartButton
@@ -562,7 +562,7 @@ ScriptsOnlyBuild:
     className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
-      Hash: de351454b2214eda5b98154567effaa5
+      Hash: 105a9808ce987b49b4c8a921a6caf230
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager

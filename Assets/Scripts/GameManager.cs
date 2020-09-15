@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
+    public int heightLevels = 3;
     public GameObject EndButton;
     public GameObject Spawner, DisturbingSpawner;
     public Text Score, Blocks;
@@ -46,12 +47,13 @@ public class GameManager : MonoBehaviour
                 blocks = int.Parse(Scenes.getParam("blocks"));
                 boostCount = int.Parse(Scenes.getParam("boost")) ;
                 freezeCount = int.Parse(Scenes.getParam("freeze"));
+                heightLevels = int.Parse(Scenes.getParam("DunesHeight"));
                 acceleration = 1+float.Parse(Scenes.getParam("acceleration"))/1000f;
                 blockRegeneration = bool.Parse(Scenes.getParam("blockRegeneration"));
-                climbing = bool.Parse(Scenes.getParam("Climbing"));
-                if(bool.Parse(Scenes.getParam("DisturbingF"))) DisturbingSpawner.SetActive(true);
+                if (bool.Parse(Scenes.getParam("DisturbingF"))) DisturbingSpawner.SetActive(true);
                 if (bool.Parse(Scenes.getParam("DecorativeF"))) Spawner.SetActive(true);
 
+                if (heightLevels > 1) climbing = true;
                 if (boostCount > 0) boost=true;
                 if (freezeCount > 0) freeze = true;
                 if (!blockRegeneration) Blocks.text = "" + blocks;
@@ -66,7 +68,7 @@ public class GameManager : MonoBehaviour
             CreateGraph(g, matrix);
             currentNode = matrix[xStart, yStart];
             if (boost) insertSpecialBlocks(matrix, boostCount, 1, 1, boostMaterial, boostList);
-            if (freeze) insertSpecialBlocks(matrix, freezeCount, 4, 8, freezeBlockMaterial, freezeList);
+            if (freeze) insertSpecialBlocks(matrix, freezeCount, 1+heightLevels, 1+heightLevels+5, freezeBlockMaterial, freezeList);
 
             matrix[xEnd, yEnd].sceneObject.GetComponent<MeshRenderer>().material = endMaterial;
             
@@ -166,6 +168,7 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(delay);
                 if (!blockList.Contains(path[0].to))
                 {
+                    Debug.Log(path[0].weight);
                     Found = 1;
                     Score.text = "" + (int.Parse(Score.text) + 1);
                     totalPath.Add(path[0]);
@@ -210,7 +213,7 @@ public class GameManager : MonoBehaviour
             {
                 matrix[i, j] = new Node(i, j, Instantiate(o));
                 matrix[i, j].sceneObject.name = ""+i+","+j;
-                if (climbing) matrix[i, j].height = (int)Random.Range(1f, 4f);
+                if (climbing) matrix[i, j].height = (int)Random.Range(1f, 1+heightLevels);
                 else matrix[i, j].height = 1;
                 matrix[i, j].sceneObject.transform.position = transform.position + transform.right * gap * (i - ((x - 1) / 2f)) + transform.forward * gap * (j - ((y - 1) / 2f))+ transform.up * -0.65f;
                 matrix[i, j].sceneObject.transform.localScale = new Vector3 ( 1,matrix[i, j].height*1.8f,1);
@@ -253,7 +256,7 @@ public class GameManager : MonoBehaviour
 
     protected float Distance(Node from, Node to)
     {
-        return to.height - from.height + 3;
+        return to.height - from.height + 5;
     }
 
     void insertSpecialBlocks(Node[,] matrix, int blockCount, int height, int weight, Material material, List<Node> specialList)

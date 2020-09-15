@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24db6ccdb8e87ff4a8067adb74ea43af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heightLevels: 5
   EndButton: {fileID: 1335292453}
   Spawner: {fileID: 1677784264}
   DisturbingSpawner: {fileID: 102624940047911056}

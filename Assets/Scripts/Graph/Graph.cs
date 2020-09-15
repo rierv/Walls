@@ -8,7 +8,6 @@ public class Graph {
 
     // holds all edgeds going out from a node
     private Dictionary<Node, List<Edge>> data;
-
     public Graph() {
         data = new Dictionary<Node, List<Edge>>();
     }
@@ -73,7 +72,7 @@ public class Graph {
 
     protected float Distance(Node from, Node to)
     {
-        return to.height - from.height + 1;
+        return to.height - from.height + 5;
     }
 
     public Edge EdgeTo (Node from, Node to)
