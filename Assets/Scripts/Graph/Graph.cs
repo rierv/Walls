@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Graph {
 
@@ -82,4 +83,19 @@ public class Graph {
 		return data.Keys.ToArray ();
 	}
 
+    public Node FindNear(float x, float y, float height, float xSize, float ySize, List<Node> blocks, int xend, int yend)
+    {
+        float min = float.MaxValue;
+        Node candidate = null;
+        foreach (Node n in getNodes())
+        {
+            if ((xend!=n.x||yend!=n.y)&&!blocks.Contains(n) && Vector2.Distance(new Vector2(x,y), new Vector2(n.x, n.y)) < min)
+            {
+                candidate = n;
+                min = Vector2.Distance(new Vector2(x, y), new Vector2(n.x*xSize, n.y*ySize));
+            }
+        }
+        if (min < 1) return candidate;
+        else return null;
+    }
 }

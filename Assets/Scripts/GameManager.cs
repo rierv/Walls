@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
+    public Terrain terrain;
     public int heightLevels = 3;
     public GameObject EndButton;
     public GameObject Spawner, DisturbingSpawner;
@@ -14,9 +15,10 @@ public class GameManager : MonoBehaviour
     public enum Heuristics { Euclidean, Manhattan, Bisector, FullBisector, Zero };
     public HeuristicFunction[] myHeuristics = { EuclideanEstimator, ManhattanEstimator, BisectorEstimator, FullBisectorEstimator, ZeroEstimator };
     public Heuristics heuristicToUse = Heuristics.Euclidean;
-    public int x = 10, y = 10, speed=5, blocks=5, RandomSeed = 0;
+    public int x = 10, y = 10, speed = 5, blocks = 5, RandomSeed = 0;
+    public float gap = 1;
     [Range(0f, 1f)] public float edgeProbability = 0.75f;
-    public float gap = 2f, delay = 0.3f, acceleration = 1.008f;
+    public float delay = 0.3f, acceleration = 1.008f;
     public Material startMaterial = null, trackMaterial = null, npcMaterial = null, endMaterial = null, boostMaterial = null, freezeMaterial = null, freezeBlockMaterial = null;
     // what to put on the scene, not really meaningful
     public GameObject sceneObject;
@@ -28,8 +30,11 @@ public class GameManager : MonoBehaviour
     private int xStart = 0, yStart = 0, xEnd = 0, yEnd = 0;
     List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>();
     float startingDelay;
+    float[,] heightPerlin;
     void Start()
     {
+
+        
         RandomSeed = (int)System.DateTime.Now.Ticks;
         Random.InitState(RandomSeed);
         if (sceneObject != null)
@@ -167,7 +172,6 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(delay);
                 if (!blockList.Contains(path[0].to))
                 {
-                    Debug.Log(path[0].weight);
                     Found = 1;
                     Score.text = "" + (int.Parse(Score.text) + 1);
                     totalPath.Add(path[0]);
@@ -210,13 +214,17 @@ public class GameManager : MonoBehaviour
         {
             for (int j = 0; j < y; j += 1)
             {
+                
                 matrix[i, j] = new Node(i, j, Instantiate(o));
-                matrix[i, j].sceneObject.name = ""+i+","+j;
-                if (climbing) matrix[i, j].height = (int)Random.Range(1f, 1+heightLevels);
+                matrix[i, j].sceneObject.name = "" + i + "," + j;
+                if (climbing) matrix[i, j].height = Random.Range(1, heightLevels);
                 else matrix[i, j].height = 1;
-                matrix[i, j].sceneObject.transform.position = transform.position + transform.right * gap * (i - ((x - 1) / 2f)) + transform.forward * gap * (j - ((y - 1) / 2f))+ transform.up * -0.65f;
-                matrix[i, j].sceneObject.transform.localScale = new Vector3 ( 1,matrix[i, j].height*1.8f,1);
+                matrix[i, j].sceneObject.transform.position = transform.position + transform.right * gap * (i - ((x - 1) / 2f)) + transform.forward * gap * (j - ((y - 1) / 2f)) + transform.up * matrix[i, j].height;
+                matrix[i, j].sceneObject.transform.localScale = new Vector3(1, matrix[i, j].height*2, 1);
                 matrix[i, j].sceneObject.transform.rotation = transform.rotation;
+                
+                
+                
             }
         }
         return matrix;

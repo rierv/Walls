@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24db6ccdb8e87ff4a8067adb74ea43af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  terrain: {fileID: 0}
   heightLevels: 5
   EndButton: {fileID: 1335292453}
   Spawner: {fileID: 1677784264}
@@ -159,14 +160,13 @@ MonoBehaviour:
   visitedMaterial: {fileID: 2100000, guid: c441c10bce6124f75906aa984bc49b6e, type: 2}
   defaultMaterial: {fileID: 2100000, guid: 2d31771e07a1734489e10efb703af10e, type: 2}
   heuristicToUse: 0
-  x: 10
+  x: 9
   y: 15
   speed: 8
   blocks: 5
   RandomSeed: 0
-  edgeProbability: 0.9
-  edgeColor: {r: 1, g: 0, b: 0, a: 1}
   gap: 1.75
+  edgeProbability: 0.9
   delay: 0.1
   acceleration: 1.008
   startMaterial: {fileID: 2100000, guid: 409f80573f4a04dde9f006374666accf, type: 2}
@@ -185,7 +185,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 279426667}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 28.613674, y: 10.457132, z: 9.905262}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -697,7 +697,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1243894587}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10.7, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 100, y: 1, z: 100}
   m_Children: []
   m_Father: {fileID: 0}

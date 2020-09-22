@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class StartButton : MonoBehaviour
 {
     public Text gridLenght, gridHeight, speed, blocks, badBoost, goodBoost, boost, freeze, acceleration, xStart, yStart, xEnd, yEnd, dunesHeight;
-    public Toggle blockRegeneration, disturbingF, decorativeF;
+    public Toggle blockRegeneration, disturbingF, decorativeF, perlin;
     // Start is called before the first frame update
     public void startGame() {
         if (Scenes.parameters == null)
@@ -29,7 +29,8 @@ public class StartButton : MonoBehaviour
         }
         //Scenes.setParam("badBoost", badBoost.text);
         //Scenes.setParam("goodBoost", goodBoost.text);
-        Scenes.Load("GameScene", Scenes.parameters);
+        if(perlin.isOn) Scenes.Load("GameScenePerlin", Scenes.parameters);
+        else Scenes.Load("GameScene", Scenes.parameters);
     }
     public void resetParameters()
     {
