@@ -89,7 +89,7 @@ public class Graph {
         Node candidate = null;
         foreach (Node n in getNodes())
         {
-            if ((xend!=n.x||yend!=n.y)&&!blocks.Contains(n) && Vector2.Distance(new Vector2(x,y), new Vector2(n.x, n.y)) < min)
+            if ((xend!=n.x||yend!=n.y)&&!blocks.Contains(n) && Vector2.Distance(new Vector2(x,y), new Vector2(n.x * xSize, n.y * ySize)) < min)
             {
                 candidate = n;
                 min = Vector2.Distance(new Vector2(x, y), new Vector2(n.x*xSize, n.y*ySize));

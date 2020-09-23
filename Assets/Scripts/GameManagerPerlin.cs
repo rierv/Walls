@@ -33,15 +33,6 @@ public class GameManagerPerlin : MonoBehaviour
     void Start()
     {
 
-        terrain.gameObject.SetActive(true);
-        td = terrain.terrainData;
-        td.size = new Vector3(x  - 1, heightLevels, y - 1);
-        //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
-        //terrain.transform.position -= Vector3.right;
-        terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y)*2 + new Vector3((x - 1) / 2, 0, (y - 1) / 2) + Vector3.right;
-        heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
-
         RandomSeed = (int)System.DateTime.Now.Ticks;
         Random.InitState(RandomSeed);
         
@@ -69,6 +60,16 @@ public class GameManagerPerlin : MonoBehaviour
             if (!blockRegeneration) Blocks.text = "" + blocks;
             else Blocks.text = "" + 5;
         }
+
+        terrain.gameObject.SetActive(true);
+        td = terrain.terrainData;
+        td.size = new Vector3(x -1, heightLevels, y -1);
+        //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
+        terrain.transform.position -= Vector3.right * .25f + Vector3.forward *.25f;
+        terrain.GetComponent<PerlinTerrain>().Build();
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 2f + new Vector3((x - 1) / 2, 0, (y - 1) / 2) + Vector3.right*.5f;
+        heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
+
         startingDelay = delay / 2;
         // create a x * y matrix of nodes (and scene objects)
         // edge weight is now the geometric distance (gap)
@@ -222,7 +223,7 @@ public class GameManagerPerlin : MonoBehaviour
             {
                 matrix[i, j] = new Node(i, j);
 
-                matrix[i, j].height = heightPerlin[(int)(j * (heightPerlin.GetLength(1) / y)), (int)(i * (heightPerlin.GetLength(0) / x))]*(heightLevels+4);
+                matrix[i, j].height = heightPerlin[(int)(j * (heightPerlin.GetLength(1) / y)), (int)(i * (heightPerlin.GetLength(0) / x))]*(heightLevels);
 
             }
         }
