@@ -11,8 +11,8 @@ public class GameManagerPerlin : MonoBehaviour
     public GameObject Spawner, DisturbingSpawner;
     public Text Score, Blocks;
     Node currentNode = null;
-    public enum Heuristics { Sight, Zero };
-    public HeuristicFunction[] myHeuristics = { SightEstimator, ZeroEstimator };
+    public enum Heuristics { Sight, Zero, Euclidian };
+    public HeuristicFunction[] myHeuristics = { SightEstimator, ZeroEstimator, EuclideanEstimator };
     public Heuristics heuristicToUse = Heuristics.Sight;
     public int x = 10, y = 10, speed = 5, blocks = 5, RandomSeed = 0;
     [Range(0f, 1f)] public float edgeProbability = 0.75f;
@@ -29,7 +29,8 @@ public class GameManagerPerlin : MonoBehaviour
     float startingDelay;
     float[,] heightPerlin;
     TerrainData td;
-    int count = 0;
+    static Vector3 terrainSize;
+    static Vector2 gridSize;
     void Start()
     {
 
@@ -92,6 +93,9 @@ public class GameManagerPerlin : MonoBehaviour
         GameObject.Find("Main Camera").transform.position = cameraPosition;
         
         start = true;
+        terrainSize = td.size;
+        gridSize = new Vector2(x, y);
+
     }
 
     void Update()
@@ -122,7 +126,6 @@ public class GameManagerPerlin : MonoBehaviour
                     if (touchedObject.name == "Terrain")
                     {
                         Node n = g.FindNear(hit.point.x, hit.point.z, hit.point.y, td.size.x/x, td.size.z/y, blockList, xEnd, yEnd);
-                        count++;
                         if (n != null)
                         {
                             if ((!boost || !boostList.Contains(n)) && (!freeze || !freezeList.Contains(n)) && !blockList.Contains(n) && int.Parse(Blocks.text) > 0 && n != currentNode)
@@ -163,47 +166,59 @@ public class GameManagerPerlin : MonoBehaviour
     private IEnumerator AnimateSolution()
     {
         Edge[] path = null;
-        int Found = 1;
+        int count = 0;
         while (!done)
         {
-            path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)heuristicToUse]);
-            // check if there is a solution
-            if (path.Length == 0)
+            path = checkPath(path);
+            if (path != null)
             {
-                EndButton.SetActive(true);
-                EndButton.GetComponentInChildren<Text>().text = "Sorry, No solution left\nScore: " + Score.text;
-                done = true;
+                if (path.Length == 0)
+                {
+                    EndButton.SetActive(true);
+                    EndButton.GetComponentInChildren<Text>().text = "Sorry, No solution left\nScore: " + Score.text;
+                    done = true;
+                }
+                else
+                {
+                    delay = (startingDelay / acceleration) * (path[0].weight - heightLevels + 5) / 2;
+                    yield return new WaitForSeconds(delay);
+                    if (!blockList.Contains(path[count].to))
+                    {
+                        Score.text = "" + (int.Parse(Score.text) + 1);
+                        totalPath.Add(path[count]);
+                        currentNode = path[count].to;
+                    }
+
+                    if (path[count].to == matrix[xEnd, yEnd])
+                    {
+                        EndButton.SetActive(true);
+                        EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
+                        done = true;
+                    }
+                    else if (boostList.Contains(path[count].to))
+                    {
+                        StartCoroutine(ChangeOfSpeedCoroutine(1, 1.6f));
+                        boostList.Remove(path[count].to);
+                    }
+                    else if (freezeList.Contains(path[count].to))
+                    {
+                        StartCoroutine(ChangeOfSpeedCoroutine(2, 1 / 1.6f));
+                        freezeList.Remove(path[count].to);
+                    }
+                    count++;
+                }
+            }
+            else if (isHit(currentNode, matrix[xEnd, yEnd]))
+            {
+                path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)Heuristics.Euclidian]);
+                Debug.Log("euclidian");
+                count = 0;
             }
             else
             {
-                delay = Found * (startingDelay / acceleration) * (path[0].weight - heightLevels + 5) / 2;
-                yield return new WaitForSeconds(delay);
-                if (!blockList.Contains(path[0].to))
-                {
-                    Found = 1;
-                    Score.text = "" + (int.Parse(Score.text) + 1);
-                    totalPath.Add(path[0]);
-                    currentNode = path[0].to;
-                }
-                else Found = 0;
-
-                if (path[0].to == matrix[xEnd, yEnd])
-                {
-                    EndButton.SetActive(true);
-                    EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
-                    done = true;
-                }
-                else if (boostList.Contains(path[0].to))
-                {
-                    StartCoroutine(ChangeOfSpeedCoroutine(1, 1.6f));
-                    boostList.Remove(path[0].to);
-                }
-                else if (freezeList.Contains(path[0].to))
-                {
-                    StartCoroutine(ChangeOfSpeedCoroutine(2, 1 / 1.6f));
-                    freezeList.Remove(path[0].to);
-                }
-
+                path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)Heuristics.Sight]);
+                Debug.Log("sight");
+                count = 0;
             }
         }
     }
@@ -329,8 +344,42 @@ public class GameManagerPerlin : MonoBehaviour
         }
 
     }
-    
 
-    protected static float SightEstimator(Node from, Node to) { return 0f; }
+    protected static float EuclideanEstimator(Node from, Node to)
+    {
+        return (getNodePosition(from) - getNodePosition(to)).magnitude;
+    }
+
+    protected static float SightEstimator(Node from, Node to) {
+        if (isHit(from, to)) return 1;
+        else return .1f;
+    }
+
     protected static float ZeroEstimator(Node from, Node to) { return 0f; }
+
+
+    static Vector3 getNodePosition(Node n)
+    {
+        return new Vector3(n.x * (terrainSize.x / gridSize.x), n.height, n.y * (terrainSize.z / gridSize.y));
+    }
+
+    static bool isHit (Node currNode, Node nodeToHit)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(getNodePosition(currNode), getNodePosition(nodeToHit) - getNodePosition(currNode), out hit, Mathf.Infinity)&& hit.collider != null) {
+             if (Vector3.Distance(hit.point, getNodePosition(nodeToHit)) < 1) return true;
+        }
+        return false;
+    }
+    Edge [] checkPath(Edge[] path)
+    {
+        if (path != null)
+        {
+            foreach (Edge e in path)
+            {
+                if (blockList.Contains(e.to)) path = null;
+            }
+        }
+        return path;
+    }
 }
