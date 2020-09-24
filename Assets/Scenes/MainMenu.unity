@@ -2771,7 +2771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   min: 3
-  max: 15
+  max: 20
 --- !u!114 &527446321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3054,7 +3054,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   min: 3
-  max: 15
+  max: 20
 --- !u!1 &573575108
 GameObject:
   m_ObjectHideFlags: 0
@@ -4059,7 +4059,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   min: 1
-  max: 5
+  max: 10
 --- !u!114 &851069257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4092,7 +4092,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 3
+  m_Text: 5
 --- !u!222 &851069258
 CanvasRenderer:
   m_ObjectHideFlags: 0

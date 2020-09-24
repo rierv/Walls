@@ -25,12 +25,14 @@ public class GameManagerPerlin : MonoBehaviour
     bool done = false, boost = false, freeze = false, start = false, blockRegeneration = true, climbing = false;
     int boostCount = 0, freezeCount = 0;
     private int xStart = 0, yStart = 0, xEnd = 9, yEnd = 9;
-    List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>();
+    List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>(), seenList = new List<Node>(), visited = new List<Node>();
     float startingDelay;
     float[,] heightPerlin;
     TerrainData td;
     static Vector3 terrainSize;
     static Vector2 gridSize;
+    bool sawTheEnd = false;
+
     void Start()
     {
 
@@ -81,6 +83,12 @@ public class GameManagerPerlin : MonoBehaviour
         CreateGraph(g, matrix);
 
         currentNode = matrix[xStart, yStart];
+        visited.Add(currentNode);
+        seenList.Add(currentNode);
+        //seenGraph.AddNode(currentNode);
+        //seenGraph.setConnections(currentNode, g.getConnections(currentNode));
+
+        
 
         if (boost) insertSpecialBlocks(matrix, boostCount, 1, 1, boostMaterial, boostList);
         if (freeze) insertSpecialBlocks(matrix, freezeCount, 1 + heightLevels, 1 + heightLevels + 5, freezeMaterial, freezeList);
@@ -105,8 +113,7 @@ public class GameManagerPerlin : MonoBehaviour
         Spawner.transform.position = startMaterial.transform.position + Vector3.up;
         if (start && ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended) || Input.GetMouseButtonDown(0)))
         {
-            if (climbing) heuristicToUse = Heuristics.Sight;
-            else heuristicToUse = Heuristics.Zero;
+
             StartCoroutine(AnimateSolution());
             if (blockRegeneration) StartCoroutine(BlocksRecovery(10 / blocks));
             start = false;
@@ -136,6 +143,7 @@ public class GameManagerPerlin : MonoBehaviour
                                 n.sceneObject = newgo;
                                 g.RemoveNodeConnections(n);
                                 blockList.Add(n);
+                                if (seenList.Contains(n)) seenList.Remove(n);
                             }
                             else if (!blockRegeneration && blockList.Contains(n))
                             {
@@ -144,8 +152,6 @@ public class GameManagerPerlin : MonoBehaviour
                                 Destroy(n.sceneObject);
                                 AddNodeConnections(n, matrix, blockList);
                                 blockList.Remove(n);
-                                Edge lockEdge = new Edge(new Node(-1, -1), n);
-                                totalPath.Add(lockEdge);
                             }
                         }
                     }
@@ -169,8 +175,7 @@ public class GameManagerPerlin : MonoBehaviour
         int count = 0;
         while (!done)
         {
-            path = checkPath(path);
-            if (path != null)
+            if (path != null && (count<path.Length|| path.Length==0))
             {
                 if (path.Length == 0)
                 {
@@ -180,27 +185,32 @@ public class GameManagerPerlin : MonoBehaviour
                 }
                 else
                 {
-                    delay = (startingDelay / acceleration) * (path[0].weight - heightLevels + 5) / 2;
+                    delay = (startingDelay / acceleration) * (path[count].weight - heightLevels + 5) / 2;
                     yield return new WaitForSeconds(delay);
-                    if (!blockList.Contains(path[count].to))
+                    path = checkPath(path);
+                    if (path!=null && !blockList.Contains(path[count].to))
                     {
                         Score.text = "" + (int.Parse(Score.text) + 1);
                         totalPath.Add(path[count]);
                         currentNode = path[count].to;
+                        visited.Add(currentNode);
+                        if(!sawTheEnd && nodeDiscover() && seenList.Contains(matrix[xEnd,yEnd])) path=null;
+                        //if (!sawTheEnd) nodeDiscover();
+
                     }
 
-                    if (path[count].to == matrix[xEnd, yEnd])
+                    if (path!=null&&path[count].to == matrix[xEnd, yEnd])
                     {
                         EndButton.SetActive(true);
                         EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
                         done = true;
                     }
-                    else if (boostList.Contains(path[count].to))
+                    else if (path != null && boostList.Contains(path[count].to))
                     {
                         StartCoroutine(ChangeOfSpeedCoroutine(1, 1.6f));
                         boostList.Remove(path[count].to);
                     }
-                    else if (freezeList.Contains(path[count].to))
+                    else if (path != null && freezeList.Contains(path[count].to))
                     {
                         StartCoroutine(ChangeOfSpeedCoroutine(2, 1 / 1.6f));
                         freezeList.Remove(path[count].to);
@@ -208,15 +218,18 @@ public class GameManagerPerlin : MonoBehaviour
                     count++;
                 }
             }
-            else if (isHit(currentNode, matrix[xEnd, yEnd]))
+            else if (isHit(currentNode, matrix[xEnd, yEnd])||sawTheEnd)
             {
-                path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)Heuristics.Euclidian]);
+                path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)Heuristics.Sight]);
+                sawTheEnd = true;
+                startMaterial.GetComponent<MeshRenderer>().material.color *= 3;
                 Debug.Log("euclidian");
                 count = 0;
+                Debug.DrawRay(getNodePosition(currentNode) +Vector3.up - Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)), getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode) +Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)) -Vector3.up, Color.white, 10);
             }
             else
             {
-                path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)Heuristics.Sight]);
+                path = AStarSolver.Solve(g, currentNode, bestNodeinSight(), myHeuristics[(int)Heuristics.Sight]);
                 Debug.Log("sight");
                 count = 0;
             }
@@ -351,8 +364,8 @@ public class GameManagerPerlin : MonoBehaviour
     }
 
     protected static float SightEstimator(Node from, Node to) {
-        if (isHit(from, to)) return 1;
-        else return .1f;
+        if (isHit(from, to)) return .1f;
+        else return 1f;
     }
 
     protected static float ZeroEstimator(Node from, Node to) { return 0f; }
@@ -366,8 +379,8 @@ public class GameManagerPerlin : MonoBehaviour
     static bool isHit (Node currNode, Node nodeToHit)
     {
         RaycastHit hit;
-        if (Physics.Raycast(getNodePosition(currNode), getNodePosition(nodeToHit) - getNodePosition(currNode), out hit, Mathf.Infinity)&& hit.collider != null) {
-             if (Vector3.Distance(hit.point, getNodePosition(nodeToHit)) < 1) return true;
+        if (Physics.Raycast(getNodePosition(currNode) + Vector3.up- Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)), getNodePosition(nodeToHit) - getNodePosition(currNode) - Vector3.up + Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)), out hit, Mathf.Infinity)&& hit.collider != null) {
+             if (Vector3.Distance(hit.point, getNodePosition(nodeToHit)) < 2) return true;
         }
         return false;
     }
@@ -381,5 +394,45 @@ public class GameManagerPerlin : MonoBehaviour
             }
         }
         return path;
+    }
+    bool nodeDiscover()
+    {
+        bool newNodesFound = false;
+        foreach(Node n in g.getNodes())
+        {
+            Debug.Log(isHit(currentNode, n));
+
+            if (!seenList.Contains(n) && !blockList.Contains(n) && isHit(currentNode, n))
+            {
+                seenList.Add(n);
+                newNodesFound = true;
+            }
+        }
+        //seenGraph.setConnections();
+        return newNodesFound;
+    }
+    Node bestNodeinSight()
+    {
+        float distance = 0;
+        Node candidate=null;
+        nodeDiscover();
+        while (candidate == null)
+        {
+            foreach (Node n in seenList)
+            {
+                /*if(Vector3.Distance(getNodePosition(n), getNodePosition(currentNode)) > distance && !visited.Contains(n))
+                {
+                    distance = Vector3.Distance(getNodePosition(n), getNodePosition(currentNode));
+                    candidate = n;
+                }*/
+                if ((n.height<currentNode.height || Random.Range(0, 5) > 1f) && !visited.Contains(n))
+                {
+                    foreach(Edge e in g.getConnections(n))
+                        if(!seenList.Contains(e.to)) candidate = n;
+                }
+            }
+        }
+        Debug.Log(candidate);
+        return candidate;
     }
 }

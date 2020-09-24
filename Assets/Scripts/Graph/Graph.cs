@@ -61,6 +61,24 @@ public class Graph {
 		if (!data.ContainsKey (n)) return new Edge[0];
 		return data [n].ToArray ();
 	}
+
+    public void setConnections(Node n, Edge[] edges)
+    {
+        if (!data.ContainsKey(n)) return;
+        data[n] = new List<Edge>(edges);
+    }
+
+    public void setConnections()
+    {
+        foreach(Node n in getNodes())
+        {
+            if (getNode("" + n.x + "" + (n.y + 1)) != null) AddEdge(new Edge(n, getNode("" + n.x + "" + (n.y + 1))));
+            if (getNode("" + n.x + "" + (n.y - 1)) != null) AddEdge(new Edge(n, getNode("" + n.x + "" + (n.y - 1))));
+            if (getNode("" + (n.x + 1) + "" + n.y) != null) AddEdge(new Edge(n, getNode("" + (n.x + 1) + "" + n.y)));
+            if (getNode("" + (n.x - 1) + "" + n.y) != null) AddEdge(new Edge(n, getNode("" + (n.x - 1) + "" + n.y)));
+        }
+    }
+
     public void changeWeight(String n, float newWeight)
     {
         foreach (Node node in getNodes())

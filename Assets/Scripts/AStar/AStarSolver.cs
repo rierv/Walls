@@ -50,7 +50,7 @@ public class AStarSolver {
 				if (status[current].distance + e.weight < status[e.to].distance) {
 					NodeExtension ne = new NodeExtension();
 					ne.distance = status[current].distance + e.weight;
-					ne.estimate = ne.distance + heuristic(e.to, goal);
+					ne.estimate = ne.distance + heuristic(start, e.to);
 					ne.predecessor = e;
 					status[e.to] = ne;
 					// unlike Dijkstra's, we can now discover better paths
