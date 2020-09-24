@@ -1271,17 +1271,17 @@ PrefabInstance:
     - target: {fileID: 4935679911011385689, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
       propertyPath: amplitude
-      value: 0.05
+      value: 0.042
       objectReference: {fileID: 0}
     - target: {fileID: 4935679911011385689, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
       propertyPath: _CohesionComponent
-      value: 0.9
+      value: 0.825
       objectReference: {fileID: 0}
     - target: {fileID: 4935679911011385689, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}
       propertyPath: _AlignComponent
-      value: 0.1
+      value: 0.16
       objectReference: {fileID: 0}
     - target: {fileID: 4935679911011385690, guid: 9131367d46d820f45aaa8fb1026695a5,
         type: 3}

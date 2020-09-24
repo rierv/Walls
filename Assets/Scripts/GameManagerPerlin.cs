@@ -181,8 +181,6 @@ public class GameManagerPerlin : MonoBehaviour
                 }
                 else
                 {
-                    delay = (startingDelay / acceleration) * (path[count].weight - heightLevels + 5) / 2;
-                    yield return new WaitForSeconds(delay);
                     path = checkPath(path);
                     if (path!=null && !blockList.Contains(path[count].to))
                     {
@@ -210,6 +208,11 @@ public class GameManagerPerlin : MonoBehaviour
                     {
                         StartCoroutine(ChangeOfSpeedCoroutine(2, 1 / 1.6f));
                         freezeList.Remove(path[count].to);
+                    }
+                    if (path != null)
+                    {
+                        delay = (startingDelay / acceleration) + ((path[count].weight - heightLevels + 1) / 2);
+                        yield return new WaitForSeconds(delay);
                     }
                     count++;
                 }
