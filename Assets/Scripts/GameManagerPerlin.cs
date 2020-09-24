@@ -16,7 +16,7 @@ public class GameManagerPerlin : MonoBehaviour
     public Heuristics heuristicToUse = Heuristics.Sight;
     public int x = 10, y = 10, speed = 5, blocks = 5, RandomSeed = 0;
     [Range(0f, 1f)] public float edgeProbability = 0.75f;
-    public float delay = 0.3f, acceleration = 1.008f;
+    public float delay = 0.3f, acceleration = 1f;
     public GameObject startMaterial = null, obstacleMaterial = null, endMaterial = null, boostMaterial = null, freezeMaterial = null;
     // what to put on the scene, not really meaningful
     List<Edge> totalPath = new List<Edge>();
@@ -52,7 +52,7 @@ public class GameManagerPerlin : MonoBehaviour
             boostCount = int.Parse(Scenes.getParam("boost"));
             freezeCount = int.Parse(Scenes.getParam("freeze"));
             heightLevels = int.Parse(Scenes.getParam("DunesHeight"));
-            acceleration = 1 + float.Parse(Scenes.getParam("acceleration")) / 1000f;
+            acceleration = float.Parse(Scenes.getParam("acceleration"))/10;
             blockRegeneration = bool.Parse(Scenes.getParam("blockRegeneration"));
             if (bool.Parse(Scenes.getParam("DisturbingF"))) DisturbingSpawner.SetActive(true);
             if (bool.Parse(Scenes.getParam("DecorativeF"))) Spawner.SetActive(true);
@@ -211,7 +211,8 @@ public class GameManagerPerlin : MonoBehaviour
                     }
                     if (path != null)
                     {
-                        delay = (startingDelay / acceleration) + ((path[count].weight - heightLevels + 1) / 2);
+                        delay = (startingDelay  + ((path[count].weight - heightLevels + 1) / 2))/ (1+acceleration);
+                        acceleration *=1.1f;
                         yield return new WaitForSeconds(delay);
                     }
                     count++;

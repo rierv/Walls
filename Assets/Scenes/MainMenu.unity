@@ -2678,7 +2678,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   min: 0
-  max: 20
+  max: 5
 --- !u!114 &504769762
 MonoBehaviour:
   m_ObjectHideFlags: 0
