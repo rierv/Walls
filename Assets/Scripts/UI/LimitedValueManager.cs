@@ -29,7 +29,7 @@ public class LimitedValueManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        trueMax = Mathf.Min(max, (int.Parse(compareTxtMax.text)));
+        trueMax = Mathf.Min(max, (int.Parse(compareTxtMax.text)-1));
         if (int.Parse(txt.text) > trueMax) txt.text = "" + trueMax;
     }
 }

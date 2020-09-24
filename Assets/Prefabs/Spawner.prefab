@@ -69,6 +69,7 @@ MonoBehaviour:
   breath: 0
   amplitude: 0.2
   speed: 1
+  newSize: 30
 --- !u!135 &4935679911011385690
 SphereCollider:
   m_ObjectHideFlags: 0

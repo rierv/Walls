@@ -101,13 +101,13 @@ public class Graph {
 		return data.Keys.ToArray ();
 	}
 
-    public Node FindNear(float x, float y, float height, float xSize, float ySize, List<Node> blocks, int xend, int yend)
+    public Node FindNear(float x, float y, float height, float xSize, float ySize, int xend, int yend)
     {
         float min = float.MaxValue;
         Node candidate = null;
         foreach (Node n in getNodes())
         {
-            if ((xend!=n.x||yend!=n.y)&&!blocks.Contains(n) && Vector2.Distance(new Vector2(x,y), new Vector2(n.x * xSize, n.y * ySize)) < min)
+            if ((xend!=n.x||yend!=n.y) && Vector2.Distance(new Vector2(x,y), new Vector2(n.x * xSize, n.y * ySize)) < min)
             {
                 candidate = n;
                 min = Vector2.Distance(new Vector2(x, y), new Vector2(n.x*xSize, n.y*ySize));

@@ -39,7 +39,7 @@ public class BoidShared : MonoBehaviour {
 		SeparationComponent = _SeparationComponent;
 	}
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (breath)
         {

@@ -27,7 +27,7 @@ public class BoidSpawner : MonoBehaviour {
     {
         foreach(BoidAlign g in boidList)
         {
-            g.radius = newRadius;
+            g.radius = newRadius/2;
         }
     }
 }

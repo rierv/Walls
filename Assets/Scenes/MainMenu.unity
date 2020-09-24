@@ -749,7 +749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e359e397dd99e408a9698adf83f916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  min: 1
+  min: 2
   max: 50
   compareTxtMax: {fileID: 550253098}
 --- !u!114 &109203925
@@ -784,7 +784,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1
+  m_Text: 2
 --- !u!222 &109203926
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2015,7 +2015,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e359e397dd99e408a9698adf83f916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  min: 1
+  min: 2
   max: 50
   compareTxtMax: {fileID: 527446321}
 --- !u!114 &330619963
@@ -2050,7 +2050,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 1
+  m_Text: 2
 --- !u!222 &330619964
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2804,7 +2804,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 8
+  m_Text: 10
 --- !u!222 &527446322
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3032,7 +3032,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 8
+  m_Text: 10
 --- !u!222 &550253099
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4282,7 +4282,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &981608995
 GameObject:
   m_ObjectHideFlags: 0
@@ -4950,7 +4950,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 8
+  m_Text: 9
 --- !u!222 &1091607439
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7627,7 +7627,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e359e397dd99e408a9698adf83f916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  min: 1
+  min: 2
   max: 50
   compareTxtMax: {fileID: 550253098}
 --- !u!114 &1612908734
@@ -7662,7 +7662,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 8
+  m_Text: 9
 --- !u!222 &1612908735
 CanvasRenderer:
   m_ObjectHideFlags: 0

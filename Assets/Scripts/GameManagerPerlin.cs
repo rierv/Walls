@@ -24,7 +24,7 @@ public class GameManagerPerlin : MonoBehaviour
     public Graph g;
     bool done = false, boost = false, freeze = false, start = false, blockRegeneration = true, climbing = false;
     int boostCount = 0, freezeCount = 0;
-    private int xStart = 0, yStart = 0, xEnd = 9, yEnd = 9;
+    private int xStart = 1, yStart = 1, xEnd = 8, yEnd = 8;
     List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>(), seenList = new List<Node>(), visited = new List<Node>();
     float startingDelay;
     float[,] heightPerlin;
@@ -88,28 +88,24 @@ public class GameManagerPerlin : MonoBehaviour
         //seenGraph.AddNode(currentNode);
         //seenGraph.setConnections(currentNode, g.getConnections(currentNode));
 
-        
-
         if (boost) insertSpecialBlocks(matrix, boostCount, 1, 1, boostMaterial, boostList);
         if (freeze) insertSpecialBlocks(matrix, freezeCount, 1 + heightLevels, 1 + heightLevels + 5, freezeMaterial, freezeList);
-        startMaterial = Instantiate(startMaterial);
-        startMaterial.transform.position = new Vector3(xStart*(td.size.x/x), matrix[xStart,yStart].height, yStart * (td.size.z / y));
-        endMaterial = Instantiate(endMaterial);
-        endMaterial.transform.position = new Vector3(xEnd * (td.size.x / x), matrix[xEnd, yEnd].height, yEnd * (td.size.z / y));
-
 
         GameObject.Find("Main Camera").transform.position = cameraPosition;
         
         start = true;
         terrainSize = td.size;
         gridSize = new Vector2(x, y);
-
+        startMaterial = Instantiate(startMaterial);
+        startMaterial.transform.position = getNodePosition(matrix[xStart, yStart]) + Vector3.up;
+        endMaterial = Instantiate(endMaterial);
+        endMaterial.transform.position = getNodePosition(matrix[xEnd, yEnd]) + Vector3.up / 2;
     }
 
     void Update()
     {
-        startMaterial.transform.position = Vector3.Lerp(startMaterial.transform.position, 
-            new Vector3(currentNode.x * (td.size.x / x), currentNode.height, currentNode.y * (td.size.z / y)), .2f);
+        startMaterial.transform.position = Vector3.Lerp(startMaterial.transform.position, getNodePosition(currentNode)+Vector3.up, 
+            (Time.deltaTime/(delay+.1f))/ Vector3.Distance(startMaterial.transform.position, getNodePosition(currentNode) + Vector3.up));
         Spawner.transform.position = startMaterial.transform.position + Vector3.up;
         if (start && ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended) || Input.GetMouseButtonDown(0)))
         {
@@ -132,14 +128,15 @@ public class GameManagerPerlin : MonoBehaviour
                     GameObject touchedObject = hit.transform.gameObject;
                     if (touchedObject.name == "Terrain")
                     {
-                        Node n = g.FindNear(hit.point.x, hit.point.z, hit.point.y, td.size.x/x, td.size.z/y, blockList, xEnd, yEnd);
+                        Node n = g.FindNear(hit.point.x, hit.point.z, hit.point.y, td.size.x/x, td.size.z/y, xEnd, yEnd);
                         if (n != null)
                         {
+
                             if ((!boost || !boostList.Contains(n)) && (!freeze || !freezeList.Contains(n)) && !blockList.Contains(n) && int.Parse(Blocks.text) > 0 && n != currentNode)
                             {
                                 Blocks.text = "" + (int.Parse(Blocks.text) - 1);
                                 GameObject newgo = Instantiate(obstacleMaterial);
-                                newgo.transform.position = new Vector3(n.x * (td.size.x / x), n.height, n.y * (td.size.z / y));
+                                newgo.transform.position = new Vector3(n.x * (td.size.x / x), n.height + 1, n.y * (td.size.z / y));
                                 n.sceneObject = newgo;
                                 g.RemoveNodeConnections(n);
                                 blockList.Add(n);
@@ -147,7 +144,6 @@ public class GameManagerPerlin : MonoBehaviour
                             }
                             else if (!blockRegeneration && blockList.Contains(n))
                             {
-
                                 Blocks.text = "" + (int.Parse(Blocks.text) + 1);
                                 Destroy(n.sceneObject);
                                 AddNodeConnections(n, matrix, blockList);
@@ -223,14 +219,12 @@ public class GameManagerPerlin : MonoBehaviour
                 path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)Heuristics.Sight]);
                 sawTheEnd = true;
                 startMaterial.GetComponent<MeshRenderer>().material.color *= 3;
-                Debug.Log("euclidian");
                 count = 0;
                 Debug.DrawRay(getNodePosition(currentNode) +Vector3.up - Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)), getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode) +Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)) -Vector3.up, Color.white, 10);
             }
             else
             {
                 path = AStarSolver.Solve(g, currentNode, bestNodeinSight(), myHeuristics[(int)Heuristics.Sight]);
-                Debug.Log("sight");
                 count = 0;
             }
         }
@@ -365,7 +359,7 @@ public class GameManagerPerlin : MonoBehaviour
 
     protected static float SightEstimator(Node from, Node to) {
         if (isHit(from, to)) return .1f;
-        else return 1f;
+        else return .9f;
     }
 
     protected static float ZeroEstimator(Node from, Node to) { return 0f; }
@@ -400,7 +394,6 @@ public class GameManagerPerlin : MonoBehaviour
         bool newNodesFound = false;
         foreach(Node n in g.getNodes())
         {
-            Debug.Log(isHit(currentNode, n));
 
             if (!seenList.Contains(n) && !blockList.Contains(n) && isHit(currentNode, n))
             {
@@ -416,23 +409,29 @@ public class GameManagerPerlin : MonoBehaviour
         float distance = 0;
         Node candidate=null;
         nodeDiscover();
+        int near = 0, minNear=0;
         while (candidate == null)
         {
             foreach (Node n in seenList)
             {
+                near = 0;
                 /*if(Vector3.Distance(getNodePosition(n), getNodePosition(currentNode)) > distance && !visited.Contains(n))
                 {
                     distance = Vector3.Distance(getNodePosition(n), getNodePosition(currentNode));
                     candidate = n;
                 }*/
-                if ((n.height<currentNode.height || Random.Range(0, 5) > 1f) && !visited.Contains(n))
+                if ((n.height <= currentNode.height || Random.Range(0, 5) > 1f) && !visited.Contains(n))
                 {
-                    foreach(Edge e in g.getConnections(n))
-                        if(!seenList.Contains(e.to)) candidate = n;
+                    foreach (Edge e in g.getConnections(n))
+                        if (!seenList.Contains(e.to)) near++;
+                    if (near > minNear)
+                    {
+                        minNear = near;
+                        candidate = n;
+                    }
                 }
             }
         }
-        Debug.Log(candidate);
         return candidate;
     }
 }
