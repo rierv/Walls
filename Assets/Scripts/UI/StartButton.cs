@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class StartButton : MonoBehaviour
 {
     public Text gridLenght, gridHeight, speed, blocks, badBoost, goodBoost, boost, freeze, acceleration, xStart, yStart, xEnd, yEnd, dunesHeight;
-    public Toggle blockRegeneration, disturbingF, decorativeF, perlin;
+    public Toggle blockRegeneration, disturbingF, decorativeF, perlin, thirdPersonView;
     // Start is called before the first frame update
     public void startGame() {
         if (Scenes.parameters == null)
@@ -24,6 +24,7 @@ public class StartButton : MonoBehaviour
             Scenes.setParam("blockRegeneration", blockRegeneration.isOn+"");
             Scenes.setParam("DecorativeF", decorativeF.isOn + "");
             Scenes.setParam("DisturbingF", disturbingF.isOn + "");
+            Scenes.setParam("thirdPersonView", thirdPersonView.isOn + "");
             Scenes.setParam("DunesHeight", dunesHeight.text);
 
         }
