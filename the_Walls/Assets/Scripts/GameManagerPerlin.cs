@@ -146,17 +146,17 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.GetKey(KeyCode.RightArrow)) {
                 pointer.transform.Rotate(0, 1f, 0);
             }
-            if (Input.gyro.userAcceleration.magnitude > .001f)
+            if (Input.gyro.attitude != Quaternion.identity)
             {
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(-Input.gyro.attitude.x, -2, 2), .05f );
-                pointer.transform.Rotate(Vector3.up * Mathf.Clamp(-Input.gyro.attitude.y, -2, 2));
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(-Input.gyro.attitude.x*5, -5, 5), .1f );
+                pointer.transform.Rotate(Vector3.up * Mathf.Clamp(-Input.gyro.attitude.y*5, -5, 5));
             }
 
         }
         else
         {
-            if (Input.gyro.userAcceleration.magnitude > .001f)
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(-Input.gyro.attitude.x, -5, 5), 0, Mathf.Clamp(-Input.gyro.attitude.y, -5, 5)), .1f);
+            if (Input.gyro.attitude != Quaternion.identity)
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.x*5, -5, 5), 0, Mathf.Clamp(Input.gyro.attitude.y*5, -5, 5)), .1f);
 
             if (Input.GetKey(KeyCode.LeftArrow))
             {
@@ -284,7 +284,7 @@ public class GameManagerPerlin : MonoBehaviour
                         if (isHit(currentNode, matrix[xEnd, yEnd]))
                         {
                             lastEndPosition = matrix[xEnd, yEnd];
-                            if (currEndPosition == null || Vector3.Distance(getNodePosition(currEndPosition), getNodePosition(lastEndPosition))>4)
+                            if (currEndPosition == null || Vector3.Distance(getNodePosition(currEndPosition), getNodePosition(lastEndPosition))>2)
                             {
                                 sawTheEnd = true;
                                 path = null;
@@ -305,6 +305,7 @@ public class GameManagerPerlin : MonoBehaviour
             else if (isHit(currentNode, matrix[xEnd, yEnd])||sawTheEnd)
             {
                 currEndPosition = matrix[xEnd, yEnd];
+                lastEndPosition = matrix[xEnd, yEnd];
                 sawTheEnd = false;
                 path = AStarSolver.Solve(g, currentNode, currEndPosition, myHeuristics[(int)Heuristics.Sight]);
                 startMaterial.GetComponent<MeshRenderer>().material.color = Color.yellow;
@@ -504,7 +505,9 @@ public class GameManagerPerlin : MonoBehaviour
         nodeDiscover();
         int near = 0, minNear=0;
         float maxDistance=0;
-        if (currentNode!=lastEndPosition && lastEndPosition  != null) return lastEndPosition;
+
+        if (currentNode == lastEndPosition) lastEndPosition = null;
+        else if (lastEndPosition!=null) return lastEndPosition;
         foreach (Node n in seenList)
         {
             near = 0;
