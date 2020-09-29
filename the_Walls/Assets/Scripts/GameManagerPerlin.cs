@@ -156,7 +156,7 @@ public class GameManagerPerlin : MonoBehaviour
         else
         {
             if (Input.gyro.userAcceleration.magnitude > .001f)
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(-Input.gyro.attitude.y, -2, 2), 0, Mathf.Clamp(-Input.gyro.attitude.x, -2, 2)), .05f);
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(-Input.gyro.attitude.x, -5, 5), 0, Mathf.Clamp(-Input.gyro.attitude.y, -5, 5)), .1f);
 
             if (Input.GetKey(KeyCode.LeftArrow))
             {
