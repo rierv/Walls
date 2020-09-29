@@ -80,7 +80,7 @@ public class GameManagerPerlin : MonoBehaviour
         //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
         terrain.transform.position -= Vector3.right*.3f  + Vector3.forward*.3f ;
         terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 2.2f + new Vector3((x - 1) / 2, 0, (y - 1) / 2) + Vector3.right*.5f;
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 2.3f + new Vector3((x - 1) / 2, 0, (y - 1) / 2) + Vector3.right*.8f;
         heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
 
         startingDelay = delay / 2;
@@ -149,9 +149,9 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y * 50, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if(Mathf.Abs(Input.gyro.attitude.y)>.05f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y * 50, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                pointer.transform.Rotate(Vector3.up * Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3));
+                if (Mathf.Abs(Input.gyro.attitude.x) > .5f) pointer.transform.Rotate(Vector3.up * Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3));
             }
 
         }

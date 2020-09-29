@@ -953,7 +953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a105f235222624d67989b5278f9db399, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subsampling: 80
+  subsampling: 70
   makeItFlat: 0
 --- !u!1 &1563517241
 GameObject:
