@@ -148,15 +148,15 @@ public class GameManagerPerlin : MonoBehaviour
             }
             if (Input.gyro.userAcceleration.magnitude > .001f)
             {
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * -Input.gyro.rotationRateUnbiased.x, .05f );
-                pointer.transform.Rotate(Vector3.up *-Input.gyro.rotationRateUnbiased.y);
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(-Input.gyro.attitude.x/90, -2, 2), .05f );
+                pointer.transform.Rotate(Vector3.up * Mathf.Clamp(-Input.gyro.attitude.y/90, -2, 2));
             }
 
         }
         else
         {
             if (Input.gyro.userAcceleration.magnitude > .001f)
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(-Input.gyro.rotationRateUnbiased.x, -Input.gyro.rotationRateUnbiased.y, 0), .05f);
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(-Input.gyro.attitude.y/90, -2, 2), 0, Mathf.Clamp(-Input.gyro.attitude.x/90, -2, 2)), .05f);
 
             if (Input.GetKey(KeyCode.LeftArrow))
             {
