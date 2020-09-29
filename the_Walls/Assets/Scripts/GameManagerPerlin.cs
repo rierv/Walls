@@ -138,7 +138,9 @@ public class GameManagerPerlin : MonoBehaviour
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
             myCamera.transform.position = endMaterial.transform.position + Vector3.up - myCamera.transform.forward *3 ;
-            if(Input.GetKey(KeyCode.Space)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward - endMaterial.transform.position )*Time.fixedDeltaTime/2);
+            Vector3 endHposition = new Vector3(endMaterial.transform.position.x, getNodePosition(matrix[xEnd, yEnd]).y+1, endMaterial.transform.position.z);
+            endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, endHposition, .5f);
+            if (Input.GetKey(KeyCode.Space)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward - endMaterial.transform.position )*Time.fixedDeltaTime/2);
             
             if (Input.GetKey(KeyCode.LeftArrow)) {
                 pointer.transform.Rotate(0, -1f,0);
@@ -149,9 +151,9 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                if(Mathf.Abs(Input.gyro.attitude.y)>.05f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y * 50, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if(Mathf.Abs(Input.gyro.attitude.y)>.6f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y * 50, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                if (Mathf.Abs(Input.gyro.attitude.x) > .5f) pointer.transform.Rotate(Vector3.up * Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3));
+                if (Mathf.Abs(Input.gyro.attitude.x) > .6f) pointer.transform.Rotate(Vector3.up * Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3));
             }
 
         }
