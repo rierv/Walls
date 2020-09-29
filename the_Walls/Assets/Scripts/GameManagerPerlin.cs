@@ -80,7 +80,7 @@ public class GameManagerPerlin : MonoBehaviour
         //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
         terrain.transform.position -= Vector3.right*.3f  + Vector3.forward*.3f ;
         terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 2f + new Vector3((x - 1) / 2, 0, (y - 1) / 2) + Vector3.right*.5f;
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 2.2f + new Vector3((x - 1) / 2, 0, (y - 1) / 2) + Vector3.right*.5f;
         heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
 
         startingDelay = delay / 2;
@@ -255,7 +255,7 @@ public class GameManagerPerlin : MonoBehaviour
                 }
                 else
                 {
-                    delay = ((startingDelay + ((path[count].weight - heightLevels + 1) / 2)) / (1 + acceleration))/2f;
+                    delay = ((startingDelay + ((path[count].weight - heightLevels + 1) / 2)) / (1 + acceleration))/1.5f;
                     acceleration *= 1.1f;
                     
                     if (path[count].to == matrix[xEnd, yEnd])
