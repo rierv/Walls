@@ -468,8 +468,8 @@ public class GameManagerPerlin : MonoBehaviour
     static bool isHit (Node currNode, Node nodeToHit)
     {
         RaycastHit hit;
-        if (Physics.Raycast(getNodePosition(currNode) + Vector3.up *1.5f- Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)*2), getNodePosition(nodeToHit) - getNodePosition(currNode) - Vector3.up*1.5f + Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)*2), out hit, Mathf.Infinity)&& hit.collider != null) {
-             if (Vector3.Distance(hit.point, getNodePosition(nodeToHit)) < 2) return true;
+        if (Physics.Raycast(getNodePosition(currNode) + Vector3.up - Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)*2), getNodePosition(nodeToHit) - getNodePosition(currNode) - Vector3.up + Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)*2), out hit, Mathf.Infinity)&& hit.collider != null) {
+             if (Vector3.Distance(hit.point, getNodePosition(nodeToHit)) < 2f && hit.normal.y > -.25f) return true;
         }
         return false;
     }

@@ -4213,7 +4213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   min: 1
-  max: 10
+  max: 15
 --- !u!114 &851069257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4246,7 +4246,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 7
+  m_Text: 9
 --- !u!222 &851069258
 CanvasRenderer:
   m_ObjectHideFlags: 0
