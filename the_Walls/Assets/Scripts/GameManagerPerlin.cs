@@ -25,7 +25,7 @@ public class GameManagerPerlin : MonoBehaviour
     bool done = false, boost = false, freeze = false, start = false, blockRegeneration = true, climbing = false;
     int boostCount = 0, freezeCount = 0;
     private int xStart = 1, yStart = 1, xEnd = 8, yEnd = 8;
-    List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>(), seenList = new List<Node>(), visited = new List<Node>();
+    List<Node> boostList = new List<Node>(), freezeList = new List<Node>(), blockList = new List<Node>(), seenList = new List<Node>();
     float startingDelay;
     float[,] heightPerlin;
     TerrainData td;
@@ -36,8 +36,14 @@ public class GameManagerPerlin : MonoBehaviour
     GameObject myCamera;
     public GameObject pointer;
     Quaternion previousRotation, toRotation;
+    Node lastEndPosition, currEndPosition;
+    Color originaNpcColor;
     void Start()
     {
+        if (!Input.gyro.enabled)
+        {
+            Input.gyro.enabled = true;
+        }
 
         RandomSeed = (int)System.DateTime.Now.Ticks;
         Random.InitState(RandomSeed);
@@ -85,10 +91,10 @@ public class GameManagerPerlin : MonoBehaviour
         // create a graph and put random edges inside
         g = new Graph();
         CreateGraph(g, matrix);
+        originaNpcColor = startMaterial.GetComponent<MeshRenderer>().sharedMaterial.color;
 
         currentNode = matrix[xStart, yStart];
         previousNode = matrix[xStart, yStart];
-        visited.Add(currentNode);
         seenList.Add(currentNode);
         //seenGraph.AddNode(currentNode);
         //seenGraph.setConnections(currentNode, g.getConnections(currentNode));
@@ -108,25 +114,71 @@ public class GameManagerPerlin : MonoBehaviour
 
         if (thirdPersonView)
         {
-            pointer.transform.position = startMaterial.transform.position + Vector3.up;
-            myCamera.transform.position = startMaterial.transform.position + Vector3.up;
-            pointer.transform.LookAt(endMaterial.transform);
-            previousRotation = myCamera.transform.rotation;
+            pointer.transform.position = endMaterial.transform.position + Vector3.up;
+            myCamera.transform.position = endMaterial.transform.position + Vector3.up;
+            pointer.transform.LookAt(new Vector3(startMaterial.transform.position.x, endMaterial.transform.position.y, startMaterial.transform.position.z));
         }
+        
+        lastEndPosition = null;
+        currEndPosition = null;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         startMaterial.transform.position = Vector3.Lerp(getNodePosition(previousNode) + Vector3.up * .5f, getNodePosition(currentNode)+ Vector3.up*.5f, (timeElapsed)/(delay));
         Spawner.transform.position = startMaterial.transform.position + Vector3.up;
+        Node nPosition = g.FindNear(endMaterial.transform.position.x, endMaterial.transform.position.z, endMaterial.transform.position.y, td.size.x / x, td.size.z / y, xEnd, yEnd);
+        if (xEnd != nPosition.x || yEnd != nPosition.y)
+        {
+            xEnd = nPosition.x;
+            yEnd = nPosition.y;
+        }
+        
         if (thirdPersonView) {
-            myCamera.transform.rotation= Quaternion.Lerp(previousRotation, pointer.transform.rotation, (timeElapsed/delay));
-            myCamera.transform.position = startMaterial.transform.position + Vector3.up - myCamera.transform.forward *4 ;
+            
+            myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
+            myCamera.transform.position = endMaterial.transform.position + Vector3.up - myCamera.transform.forward *4 ;
+            if(Input.GetKey(KeyCode.Space)) endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward, .1f);
+            
+            if (Input.GetKey(KeyCode.LeftArrow)) {
+                pointer.transform.Rotate(0, -1f,0);
+            }
+            if (Input.GetKey(KeyCode.RightArrow)) {
+                pointer.transform.Rotate(0, 1f, 0);
+            }
+            if (Input.gyro.userAcceleration.magnitude > .001f)
+            {
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * -Input.gyro.rotationRateUnbiased.x, .05f );
+                pointer.transform.Rotate(Vector3.up *-Input.gyro.rotationRateUnbiased.y);
+            }
+
+        }
+        else
+        {
+            if (Input.gyro.userAcceleration.magnitude > .001f)
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(-Input.gyro.rotationRateUnbiased.x, -Input.gyro.rotationRateUnbiased.y, 0), .05f);
+
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) - Vector3.right, .05f);
+            }
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + Vector3.right, .05f);
+            }
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + Vector3.forward, .05f);
+            }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) - Vector3.forward, .05f);
+            }
         }
 
-        timeElapsed += Time.deltaTime;
+        timeElapsed += Time.fixedDeltaTime;
 
-        if (start && ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended) || Input.GetMouseButtonDown(0)))
+        if (start && ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Ended) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)))
         {
 
             StartCoroutine(AnimateSolution());
@@ -200,7 +252,7 @@ public class GameManagerPerlin : MonoBehaviour
                 }
                 else
                 {
-                    delay = (startingDelay + ((path[count].weight - heightLevels + 1) / 2)) / (1 + acceleration);
+                    delay = ((startingDelay + ((path[count].weight - heightLevels + 1) / 2)) / (1 + acceleration))/2f;
                     acceleration *= 1.1f;
                     
                     if (path[count].to == matrix[xEnd, yEnd])
@@ -227,16 +279,20 @@ public class GameManagerPerlin : MonoBehaviour
                         previousNode = currentNode;
                         currentNode = path[count].to;
                         timeElapsed = 0;
-                        visited.Add(currentNode);
-                        if (thirdPersonView)
+                        Debug.Log(isHit(currentNode, matrix[xEnd, yEnd]));
+                        nodeDiscover();
+                        if (isHit(currentNode, matrix[xEnd, yEnd]))
                         {
-                            pointer.transform.LookAt(getNodePosition(currentNode));
-                            previousRotation = myCamera.transform.rotation;
-                            toRotation = pointer.transform.rotation;
+                            lastEndPosition = currEndPosition;
+                            currEndPosition = matrix[xEnd, yEnd];
+                            if (lastEndPosition == null || lastEndPosition != currEndPosition)
+                            {
+                                sawTheEnd = true;
+                                path = null;
+                            }
                         }
-                        if (!sawTheEnd && nodeDiscover() && seenList.Contains(matrix[xEnd, yEnd]))
+                        else if (currEndPosition!= null)
                         {
-                            sawTheEnd = true;
                             path = null;
                         }
                         yield return new WaitForSeconds(delay);
@@ -249,13 +305,19 @@ public class GameManagerPerlin : MonoBehaviour
             }
             else if (isHit(currentNode, matrix[xEnd, yEnd])||sawTheEnd)
             {
-                path = AStarSolver.Solve(g, currentNode, matrix[xEnd, yEnd], myHeuristics[(int)Heuristics.Sight]);
-                startMaterial.GetComponent<MeshRenderer>().material.color *= 3;
+                lastEndPosition = currEndPosition;
+                currEndPosition = matrix[xEnd, yEnd];
+                sawTheEnd = false;
+                path = AStarSolver.Solve(g, currentNode, lastEndPosition, myHeuristics[(int)Heuristics.Sight]);
+                startMaterial.GetComponent<MeshRenderer>().material.color = Color.yellow;
                 count = 0;
                 Debug.DrawRay(getNodePosition(currentNode) +Vector3.up - Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)), getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode) +Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)) -Vector3.up, Color.white, 10);
             }
             else
             {
+                lastEndPosition = currEndPosition;
+                currEndPosition = null;
+                startMaterial.GetComponent<MeshRenderer>().material.color = originaNpcColor;
                 path = AStarSolver.Solve(g, currentNode, bestNodeinSight(), myHeuristics[(int)Heuristics.Sight]);
                 count = 0;
             }
@@ -399,7 +461,7 @@ public class GameManagerPerlin : MonoBehaviour
 
     static Vector3 getNodePosition(Node n)
     {
-        return new Vector3(n.x * (terrainSize.x / gridSize.x), n.height, n.y * (terrainSize.z / gridSize.y));
+        return new Vector3(n.x * Mathf.Floor((terrainSize.x / gridSize.x)), n.height, n.y * Mathf.Floor((terrainSize.z / gridSize.y)));
     }
 
     static bool isHit (Node currNode, Node nodeToHit)
@@ -423,15 +485,18 @@ public class GameManagerPerlin : MonoBehaviour
     }
     bool nodeDiscover()
     {
+
         bool newNodesFound = false;
         foreach(Node n in g.getNodes())
         {
+            //Debug.DrawRay(getNodePosition(currentNode) + Vector3.up, getNodePosition(n) - getNodePosition(currentNode), Color.white, 10);
 
-            if (!seenList.Contains(n) && !blockList.Contains(n) && isHit(currentNode, n))
+            if (!blockList.Contains(n) && isHit(currentNode, n))
             {
                 seenList.Add(n);
                 newNodesFound = true;
             }
+            else seenList.Remove(n);
         }
         //seenGraph.setConnections();
         return newNodesFound;
@@ -442,21 +507,17 @@ public class GameManagerPerlin : MonoBehaviour
         nodeDiscover();
         int near = 0, minNear=0;
         float maxDistance=0;
-
+        if (currentNode!=lastEndPosition && lastEndPosition  != null) return lastEndPosition;
         foreach (Node n in seenList)
         {
             near = 0;
-            
-            if (!visited.Contains(n))
+            foreach (Edge e in g.getConnections(n))
+                if (!seenList.Contains(e.to)) near++;
+            if (near > minNear && Vector3.Distance(getNodePosition(n), getNodePosition(currentNode)) > maxDistance)
             {
-                foreach (Edge e in g.getConnections(n))
-                    if (!seenList.Contains(e.to)) near++;
-                if (near > minNear && Vector3.Distance(getNodePosition(n), getNodePosition(currentNode)) > maxDistance)
-                {
-                    minNear = near;
-                    maxDistance = Vector3.Distance(getNodePosition(n), getNodePosition(currentNode));
-                    candidate = n;
-                }
+                minNear = near;
+                maxDistance = Vector3.Distance(getNodePosition(n), getNodePosition(currentNode));
+                candidate = n;
             }
         }
         if (candidate == null) candidate=g.getConnections(currentNode)[0].to;

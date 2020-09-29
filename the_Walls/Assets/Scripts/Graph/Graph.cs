@@ -113,7 +113,6 @@ public class Graph {
                 min = Vector2.Distance(new Vector2(x, y), new Vector2(n.x*xSize, n.y*ySize));
             }
         }
-        if (min < 1) return candidate;
-        else return null;
+        return candidate;
     }
 }
