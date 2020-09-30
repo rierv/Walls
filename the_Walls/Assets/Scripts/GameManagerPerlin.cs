@@ -38,6 +38,7 @@ public class GameManagerPerlin : MonoBehaviour
     Quaternion previousRotation, toRotation;
     Node lastEndPosition, currEndPosition;
     Color originaNpcColor;
+    float rotationX=0, rotationY=0;
     void Start()
     {
         if (!Input.gyro.enabled)
@@ -133,7 +134,11 @@ public class GameManagerPerlin : MonoBehaviour
             xEnd = nPosition.x;
             yEnd = nPosition.y;
         }
-        
+        if (Input.gyro.userAcceleration.magnitude > .01f)
+        {
+            rotationX += Input.gyro.userAcceleration.x * Time.fixedDeltaTime * Time.fixedDeltaTime;
+            rotationY += Input.gyro.userAcceleration.y * Time.fixedDeltaTime * Time.fixedDeltaTime;
+        }
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
@@ -149,16 +154,16 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                if(Mathf.Abs(Input.gyro.attitude.eulerAngles.y)>5) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.eulerAngles.y /5, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(rotationX * 50, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                if (Mathf.Abs(Input.gyro.attitude.eulerAngles.x) > 5) pointer.transform.Rotate(Vector3.up * Mathf.Clamp(Input.gyro.attitude.eulerAngles.x/25, -3, 3));
+                pointer.transform.Rotate(Vector3.up * Mathf.Clamp(rotationY*5, -3, 3));
             }
 
         }
         else
         {
             if (Input.gyro.attitude != Quaternion.identity)
-                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.eulerAngles.x /25, -3, 3), 0, Mathf.Clamp(Input.gyro.attitude.eulerAngles.y /25, -3, 3)) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(rotationX * 5, -3, 3), 0, Mathf.Clamp(rotationY * 5, -3, 3)) - endMaterial.transform.position) * Time.fixedDeltaTime);
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3), 0, Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3)), .1f);
 
             if (Input.GetKey(KeyCode.LeftArrow))
