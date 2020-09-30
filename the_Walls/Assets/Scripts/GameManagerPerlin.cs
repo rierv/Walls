@@ -136,8 +136,8 @@ public class GameManagerPerlin : MonoBehaviour
         }
         if (Input.gyro.userAcceleration.magnitude > .01f)
         {
-            rotationX += Input.gyro.userAcceleration.x * Time.fixedDeltaTime * Time.fixedDeltaTime;
-            rotationY += Input.gyro.userAcceleration.y * Time.fixedDeltaTime * Time.fixedDeltaTime;
+            rotationX += Input.gyro.userAcceleration.x ;
+            rotationY += Input.gyro.userAcceleration.y ;
         }
         if (thirdPersonView) {
             
@@ -154,16 +154,16 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(rotationX * 50, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(rotationY*5, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                pointer.transform.Rotate(Vector3.up * Mathf.Clamp(rotationY*5, -3, 3));
+                pointer.transform.Rotate(Vector3.up * Mathf.Clamp(rotationX, -3, 3));
             }
 
         }
         else
         {
             if (Input.gyro.attitude != Quaternion.identity)
-                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(rotationX * 5, -3, 3), 0, Mathf.Clamp(rotationY * 5, -3, 3)) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(rotationX, -3, 3), 0, Mathf.Clamp(rotationY, -3, 3)) - endMaterial.transform.position) * Time.fixedDeltaTime);
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3), 0, Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3)), .1f);
 
             if (Input.GetKey(KeyCode.LeftArrow))
