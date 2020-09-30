@@ -153,9 +153,8 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                if(Mathf.Abs(Input.gyro.attitude.y)>.08f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(correctedQuaternion.eulerAngles.y * 50, -2, 2) - endMaterial.transform.position) * Time.fixedDeltaTime);
-
-                if (Mathf.Abs(Input.gyro.attitude.x) > .08f) pointer.transform.Rotate(Vector3.up * Mathf.Clamp(-correctedQuaternion.x*5, -2, 2));
+                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward - endMaterial.transform.position) * Time.fixedDeltaTime);
+                pointer.transform.rotation = correctedQuaternion;
             }
 
         }
