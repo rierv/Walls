@@ -38,7 +38,6 @@ public class GameManagerPerlin : MonoBehaviour
     Quaternion previousRotation, toRotation;
     Node lastEndPosition, currEndPosition;
     Color originaNpcColor;
-    float rotationX=0, rotationY=0;
     void Start()
     {
         if (!Input.gyro.enabled)
@@ -134,11 +133,7 @@ public class GameManagerPerlin : MonoBehaviour
             xEnd = nPosition.x;
             yEnd = nPosition.y;
         }
-        if (Input.gyro.userAcceleration.magnitude > .01f)
-        {
-            rotationX = Mathf.Clamp( rotationX - Input.gyro.rotationRateUnbiased.x*50 , -1, 1) ;
-            rotationY = Mathf.Clamp(rotationY - Input.gyro.rotationRateUnbiased.y*50, -1, 1) ;
-        }
+        
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
@@ -154,16 +149,16 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * rotationX*5 - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if(Mathf.Abs(Input.gyro.attitude.y)>.08f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y * 50, -3, 3) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                pointer.transform.Rotate(Vector3.up * rotationY);
+                if (Mathf.Abs(Input.gyro.attitude.x) > .08f) pointer.transform.Rotate(Vector3.up * Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3));
             }
 
         }
         else
         {
             if (Input.gyro.attitude != Quaternion.identity)
-                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(rotationX, 0, rotationY) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.x * 5, -3, 3), 0, Mathf.Clamp(Input.gyro.attitude.y * 5, -3, 3)) - endMaterial.transform.position) * Time.fixedDeltaTime);
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3), 0, Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3)), .1f);
 
             if (Input.GetKey(KeyCode.LeftArrow))
