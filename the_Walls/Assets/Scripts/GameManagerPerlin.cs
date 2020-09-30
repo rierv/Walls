@@ -136,8 +136,8 @@ public class GameManagerPerlin : MonoBehaviour
         }
         if (Input.gyro.userAcceleration.magnitude > .01f)
         {
-            rotationX = Mathf.Clamp( rotationX - Input.gyro.userAcceleration.x*50 , -1, 1) ;
-            rotationY = Mathf.Clamp(rotationY - Input.gyro.userAcceleration.y*50, -1, 1) ;
+            rotationX = Mathf.Clamp( rotationX - Input.gyro.rotationRateUnbiased.x*50 , -1, 1) ;
+            rotationY = Mathf.Clamp(rotationY - Input.gyro.rotationRateUnbiased.y*50, -1, 1) ;
         }
         if (thirdPersonView) {
             
