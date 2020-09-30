@@ -136,10 +136,10 @@ public class GameManagerPerlin : MonoBehaviour
         }
         if (Input.gyro.userAcceleration.magnitude > .01f)
         {
-            rotationX = Mathf.Clamp( rotationX - Input.gyro.userAcceleration.x*5 , -2, 2) ;
-            rotationY = Mathf.Clamp(rotationY - Input.gyro.userAcceleration.y*5, -2, 2) ;
-            Mathf.Lerp(rotationX, 0, .5f);
-            Mathf.Lerp(rotationY, 0, .5f);
+            rotationX = Mathf.Clamp( rotationX - Input.gyro.userAcceleration.x*100 , -1, 1) ;
+            rotationY = Mathf.Clamp(rotationY - Input.gyro.userAcceleration.y*100, -1, 1) ;
+            Mathf.Lerp(rotationX, 0, .9f);
+            Mathf.Lerp(rotationY, 0, .9f);
         }
         if (thirdPersonView) {
             
@@ -156,9 +156,9 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * rotationY - endMaterial.transform.position) * Time.fixedDeltaTime);
+                endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * rotationX*5 - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                pointer.transform.Rotate(Vector3.up * rotationX/5);
+                pointer.transform.Rotate(Vector3.up * rotationY/5);
             }
 
         }
