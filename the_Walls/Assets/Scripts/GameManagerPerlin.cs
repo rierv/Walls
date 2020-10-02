@@ -149,7 +149,7 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.GetKey(KeyCode.RightArrow)) {
                 pointer.transform.Rotate(0, 1f, 0);
             }
-            if (Input.gyro.attitude != Quaternion.identity && Mathf.Abs(gyroPointer.transform.forward.y) < .3f)
+            if (Input.gyro.attitude != Quaternion.identity && (Mathf.Abs(gyroPointer.transform.up.x) < .3f || Mathf.Abs(gyroPointer.transform.up.x) > .7f))
             {
                 if (gyroPointer.transform.up.z < -.3f ) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
                 if (gyroPointer.transform.up.z > .3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
@@ -168,7 +168,7 @@ public class GameManagerPerlin : MonoBehaviour
         }
         else
         {
-            if (Input.gyro.attitude != Quaternion.identity && Mathf.Abs(gyroPointer.transform.forward.y) < .3f)
+            if (Input.gyro.attitude != Quaternion.identity && (Mathf.Abs(gyroPointer.transform.up.x) < .3f || Mathf.Abs(gyroPointer.transform.up.x) > .7f))
             {
                 //endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp((correctedQuaternion.eulerAngles.x - 180) * 5, -2, 2), 0, Mathf.Clamp((correctedQuaternion.eulerAngles.y - 180) * 5, -2, 2)) - endMaterial.transform.position) * Time.fixedDeltaTime);
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3), 0, Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3)), .1f);
