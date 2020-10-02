@@ -40,14 +40,15 @@ public class GameManagerPerlin : MonoBehaviour
     Color originaNpcColor;
     public float playerSpeed=2;
     public GameObject gyroPointer;
-    Quaternion startRot;
+    Quaternion startRot, startRotGyro;
     void Start()
     {
 
         if (!Input.gyro.enabled)
         {
             Input.gyro.enabled = true;
-            startRot = Quaternion.Inverse(Input.gyro.attitude);
+            startRot = gyroPointer.transform.rotation;
+            startRotGyro = Quaternion.Inverse(Input.gyro.attitude);
         }
 
         RandomSeed = (int)System.DateTime.Now.Ticks;
@@ -139,7 +140,7 @@ public class GameManagerPerlin : MonoBehaviour
             yEnd = nPosition.y;
         }
         endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, checkTerrainPosition(), Time.fixedDeltaTime);
-        gyroPointer.transform.rotation = startRot*Input.gyro.attitude;
+        gyroPointer.transform.rotation = startRot*startRotGyro*Input.gyro.attitude;
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
