@@ -81,7 +81,7 @@ public class GameManagerPerlin : MonoBehaviour
         //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
         //terrain.transform.position -= Vector3.right*.8f  + Vector3.forward*.8f ;
         terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.3f + new Vector3((x - 1) / 2, 0, 0) -Vector3.forward * x /3;
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.3f + new Vector3((x - 1) / 2, 0, 0) -Vector3.forward * x/1.5f;
         heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
 
         startingDelay = delay / 2;
@@ -151,8 +151,8 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                if ((Input.gyro.attitude.x > .15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
-                if ((Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.x > .15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if ((Input.gyro.attitude.y > .15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.y < -.15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if ((Input.gyro.attitude.y < -.15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.y > .15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
 
                 if ((Input.gyro.attitude.x > .15f && Input.gyro.attitude.w >0)|| (Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w < 0)) pointer.transform.Rotate(Vector3.up);
                 if ((Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w > 0)|| (Input.gyro.attitude.x > .15f && Input.gyro.attitude.w < 0)) pointer.transform.Rotate(-Vector3.up);
