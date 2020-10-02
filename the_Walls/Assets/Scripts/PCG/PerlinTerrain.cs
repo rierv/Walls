@@ -8,8 +8,8 @@ public class PerlinTerrain : MonoBehaviour {
 
 	public int subsampling = 50;
 	public bool makeItFlat = false;
-    float[,] h;
-    public void Build () {
+	float[,] h;
+	public void Build () {
 		Terrain t = GetComponent<Terrain> ();
 		TerrainData td = t.terrainData;
 		int x = td.heightmapResolution;
@@ -24,8 +24,8 @@ public class PerlinTerrain : MonoBehaviour {
         int xCut = subsampling * ((int)Mathf.Ceil (x / subsampling));
 		int yCut = subsampling * ((int)Mathf.Ceil (y / subsampling));
 
-		h = new float [y, x];
-		Vector2 [,] slopes = new Vector2 [y+subsampling, x+subsampling];
+		h = new float[y, x];
+		Vector2[,] slopes = new Vector2 [y+subsampling, x+subsampling];
 
 		// first, set up the slopes and height at lattice points
 		for (int i = 0; i < xCut+subsampling; i += subsampling) {

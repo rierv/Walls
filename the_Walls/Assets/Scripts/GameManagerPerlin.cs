@@ -79,9 +79,9 @@ public class GameManagerPerlin : MonoBehaviour
         td = terrain.terrainData;
         td.size = new Vector3(x, heightLevels-1, y);
         //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
-        terrain.transform.position -= Vector3.right*.3f  + Vector3.forward*.3f ;
+        //terrain.transform.position -= Vector3.right*.8f  + Vector3.forward*.8f ;
         terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 2.3f + new Vector3((x - 1) / 2, 0, (y - 1) / 2) + Vector3.right*.8f;
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.3f + new Vector3((x - 1) / 2, 0, 0) -Vector3.forward * x /3;
         heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
 
         startingDelay = delay / 2;
@@ -134,11 +134,13 @@ public class GameManagerPerlin : MonoBehaviour
             xEnd = nPosition.x;
             yEnd = nPosition.y;
         }
+        endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, checkTerrainPosition(), Time.fixedDeltaTime);
+
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
             myCamera.transform.position = endMaterial.transform.position + Vector3.up - myCamera.transform.forward *3 ;
-            if (Input.GetKey(KeyCode.Space)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward - endMaterial.transform.position )*Time.fixedDeltaTime/2);
+            if (Input.GetKey(KeyCode.Space)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward*playerSpeed - endMaterial.transform.position )*Time.fixedDeltaTime);
             
             if (Input.GetKey(KeyCode.LeftArrow)) {
                 pointer.transform.Rotate(0, -1f,0);
@@ -149,11 +151,11 @@ public class GameManagerPerlin : MonoBehaviour
             if (Input.gyro.attitude != Quaternion.identity)
             {
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                if (Input.gyro.attitude.y > .15f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
-                if (Input.gyro.attitude.y < -.15f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if ((Input.gyro.attitude.x > .15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if ((Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.x > .15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                if (Input.gyro.attitude.x > .15f) pointer.transform.Rotate(Vector3.up);
-                if (Input.gyro.attitude.x < -.15f) pointer.transform.Rotate(-Vector3.up);
+                if ((Input.gyro.attitude.x > .15f && Input.gyro.attitude.w >0)|| (Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w < 0)) pointer.transform.Rotate(Vector3.up);
+                if ((Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w > 0)|| (Input.gyro.attitude.x > .15f && Input.gyro.attitude.w < 0)) pointer.transform.Rotate(-Vector3.up);
             }
 
         }
@@ -172,19 +174,19 @@ public class GameManagerPerlin : MonoBehaviour
             }
             if (Input.GetKey(KeyCode.LeftArrow))
             {
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) - Vector3.right, .05f);
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) - Vector3.right, Time.fixedDeltaTime);
             }
             if (Input.GetKey(KeyCode.RightArrow))
             {
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + Vector3.right, .05f);
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + Vector3.right, Time.fixedDeltaTime);
             }
             if (Input.GetKey(KeyCode.UpArrow))
             {
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + Vector3.forward, .05f);
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + Vector3.forward, Time.fixedDeltaTime);
             }
             if (Input.GetKey(KeyCode.DownArrow))
             {
-                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) - Vector3.forward, .05f);
+                endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) - Vector3.forward, Time.fixedDeltaTime);
             }
         }
 
@@ -293,8 +295,9 @@ public class GameManagerPerlin : MonoBehaviour
                         timeElapsed = 0;
                         Debug.Log(isHit(currentNode, matrix[xEnd, yEnd]));
                         nodeDiscover();
-                        if (isHit(currentNode, matrix[xEnd, yEnd]))
+                        if (isPlayerOnSight())
                         {
+                            startMaterial.GetComponent<MeshRenderer>().material.color = Color.yellow;
                             lastEndPosition = matrix[xEnd, yEnd];
                             if (currEndPosition == null || Vector3.Distance(getNodePosition(currEndPosition), getNodePosition(lastEndPosition))>2)
                             {
@@ -314,7 +317,7 @@ public class GameManagerPerlin : MonoBehaviour
                     count++;
                 }
             }
-            else if (isHit(currentNode, matrix[xEnd, yEnd])||sawTheEnd)
+            else if (isPlayerOnSight() || sawTheEnd)
             {
                 currEndPosition = matrix[xEnd, yEnd];
                 lastEndPosition = matrix[xEnd, yEnd];
@@ -322,7 +325,7 @@ public class GameManagerPerlin : MonoBehaviour
                 path = AStarSolver.Solve(g, currentNode, currEndPosition, myHeuristics[(int)Heuristics.Sight]);
                 startMaterial.GetComponent<MeshRenderer>().material.color = Color.yellow;
                 count = 0;
-                Debug.DrawRay(getNodePosition(currentNode) +Vector3.up - Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)), getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode) +Vector3.Normalize(getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode)) -Vector3.up, Color.white, 10);
+                Debug.DrawRay(getNodePosition(currentNode) +Vector3.up, getNodePosition(matrix[xEnd, yEnd]) - getNodePosition(currentNode), Color.white, 20);
             }
             else
             {
@@ -477,8 +480,8 @@ public class GameManagerPerlin : MonoBehaviour
     static bool isHit (Node currNode, Node nodeToHit)
     {
         RaycastHit hit;
-        if (Physics.Raycast(getNodePosition(currNode) + Vector3.up - Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)*2), getNodePosition(nodeToHit) - getNodePosition(currNode) - Vector3.up + Vector3.Normalize(getNodePosition(nodeToHit) - getNodePosition(currNode)*2), out hit, Mathf.Infinity)&& hit.collider != null) {
-             if (Vector3.Distance(hit.point, getNodePosition(nodeToHit)) < 2f && hit.normal.y > -.25f) return true;
+        if (Physics.Raycast(getNodePosition(currNode) + Vector3.up, (getNodePosition(nodeToHit) - getNodePosition(currNode)).normalized, out hit, Mathf.Infinity)&& hit.collider != null) {
+             if (Vector3.Distance(hit.point, getNodePosition(nodeToHit)) < 1.5f && hit.normal.y > -.1f) return true;
         }
         return false;
     }
@@ -534,5 +537,41 @@ public class GameManagerPerlin : MonoBehaviour
         }
         if (candidate == null) candidate=g.getConnections(currentNode)[0].to;
         return candidate;
+    }
+    bool isPlayerOnSight()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(startMaterial.transform.position, (endMaterial.transform.position -startMaterial.transform.position).normalized, out hit, Mathf.Infinity) && hit.collider != null)
+        {
+            if(hit.collider.gameObject==endMaterial) return true;
+        }
+        return false;
+    }
+    Vector3 checkTerrainPosition()
+    {
+        int layerMask = 1 << 8;
+        RaycastHit hit;
+        if (Physics.Raycast(endMaterial.transform.position + Vector3.right, endMaterial.transform.position + Vector3.right + Vector3.up, out hit, Mathf.Infinity, layerMask) && hit.collider != null)
+        {
+            Debug.Log("Puppete");
+            if (hit.collider.gameObject == terrain) return hit.point + Vector3.up * 2f;
+        }
+        if (Physics.Raycast(endMaterial.transform.position - Vector3.right, endMaterial.transform.position - Vector3.right - Vector3.up, out hit, Mathf.Infinity, layerMask) && hit.collider != null)
+        {
+            Debug.Log("Puppete2");
+            if (hit.collider.gameObject == terrain) return hit.point + Vector3.up * 2f;
+        }
+        if (Physics.Raycast(endMaterial.transform.position - Vector3.forward, endMaterial.transform.position - Vector3.forward - Vector3.up, out hit, Mathf.Infinity, layerMask) && hit.collider != null)
+        {
+            Debug.Log("Puppete2");
+            if (hit.collider.gameObject == terrain) return hit.point + Vector3.up * 2f;
+        }
+        if (Physics.Raycast(endMaterial.transform.position + Vector3.forward, endMaterial.transform.position + Vector3.forward - Vector3.up, out hit, Mathf.Infinity, layerMask) && hit.collider != null)
+        {
+            Debug.Log("Puppete2");
+            if (hit.collider.gameObject == terrain) return hit.point + Vector3.up*2f;
+        }
+
+        return new Vector3 (endMaterial.transform.position.x, getNodePosition(matrix[xEnd,yEnd]).y, endMaterial.transform.position.z);
     }
 }
