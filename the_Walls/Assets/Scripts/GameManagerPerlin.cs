@@ -82,7 +82,7 @@ public class GameManagerPerlin : MonoBehaviour
         //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
         //terrain.transform.position -= Vector3.right*.8f  + Vector3.forward*.8f ;
         terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.5f + new Vector3((x - 1) / 2, 0, 0) -Vector3.forward * x;
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.5f + new Vector3((x - 1) / 1.8f, 0, 0) -Vector3.forward * x*1.3f;
         heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
 
         startingDelay = delay / 2;
@@ -151,10 +151,10 @@ public class GameManagerPerlin : MonoBehaviour
             }
             if (Input.gyro.attitude != Quaternion.identity && gyroPointer.transform.up.y > .3f && gyroPointer.transform.forward.z > .7f)
             {
-                if (gyroPointer.transform.up.z < -.3f ) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
-                if (gyroPointer.transform.up.z > .3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
-                if (gyroPointer.transform.forward.x < -.3f) pointer.transform.Rotate(Vector3.up);
-                if (gyroPointer.transform.forward.x > .3f) pointer.transform.Rotate(-Vector3.up);
+                if (gyroPointer.transform.up.z < -.2f ) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.up.z > .2f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.forward.x < -.2f) pointer.transform.Rotate(Vector3.up);
+                if (gyroPointer.transform.forward.x > .2f) pointer.transform.Rotate(-Vector3.up);
 
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
                 /*if ((Input.gyro.attitude.y > .15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.y < -.15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
@@ -172,11 +172,11 @@ public class GameManagerPerlin : MonoBehaviour
             {
                 //endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp((correctedQuaternion.eulerAngles.x - 180) * 5, -2, 2), 0, Mathf.Clamp((correctedQuaternion.eulerAngles.y - 180) * 5, -2, 2)) - endMaterial.transform.position) * Time.fixedDeltaTime);
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + new Vector3(Mathf.Clamp(Input.gyro.attitude.x*5, -3, 3), 0, Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3)), .1f);
-                if (gyroPointer.transform.up.z < -.3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(0, 0, playerSpeed) - endMaterial.transform.position) * Time.fixedDeltaTime);
-                if (gyroPointer.transform.up.z > .3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(0, 0, -playerSpeed) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.up.z < -.2f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(0, 0, playerSpeed) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.up.z > .2f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(0, 0, -playerSpeed) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                if (gyroPointer.transform.forward.x < -.3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
-                if (gyroPointer.transform.forward.x > .3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(-playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.forward.x > .2f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.forward.x < -.2f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(-playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
             }
             if (Input.GetKey(KeyCode.LeftArrow))
