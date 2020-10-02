@@ -82,7 +82,7 @@ public class GameManagerPerlin : MonoBehaviour
         //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
         //terrain.transform.position -= Vector3.right*.8f  + Vector3.forward*.8f ;
         terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.3f + new Vector3((x - 1) / 2, 0, 0) -Vector3.forward * x/1.5f;
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.5f + new Vector3((x - 1) / 2, 0, 0) -Vector3.forward * x;
         heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
 
         startingDelay = delay / 2;
@@ -175,8 +175,8 @@ public class GameManagerPerlin : MonoBehaviour
                 if (gyroPointer.transform.up.z < -.3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(0, 0, playerSpeed) - endMaterial.transform.position) * Time.fixedDeltaTime);
                 if (gyroPointer.transform.up.z > .3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(0, 0, -playerSpeed) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
-                if (gyroPointer.transform.right.x < -.3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
-                if (gyroPointer.transform.right.x > .3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(-playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.forward.x < -.3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.forward.x > .3f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + new Vector3(-playerSpeed, 0, 0) - endMaterial.transform.position) * Time.fixedDeltaTime);
 
             }
             if (Input.GetKey(KeyCode.LeftArrow))
