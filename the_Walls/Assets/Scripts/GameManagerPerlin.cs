@@ -40,11 +40,14 @@ public class GameManagerPerlin : MonoBehaviour
     Color originaNpcColor;
     public float playerSpeed=2;
     public GameObject gyroPointer;
+    Quaternion startRot;
     void Start()
     {
+
         if (!Input.gyro.enabled)
         {
             Input.gyro.enabled = true;
+            startRot = Quaternion.Inverse(Input.gyro.attitude);
         }
 
         RandomSeed = (int)System.DateTime.Now.Ticks;
@@ -82,7 +85,7 @@ public class GameManagerPerlin : MonoBehaviour
         //terrain.transform.position -=  Vector3((x - 1) / 2, 0, (y - 1) / 2);
         //terrain.transform.position -= Vector3.right*.8f  + Vector3.forward*.8f ;
         terrain.GetComponent<PerlinTerrain>().Build();
-        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 1.5f + new Vector3((x - 1) / 1.8f, 0, 0) -Vector3.forward * x*1.3f;
+        Vector3 cameraPosition = terrain.transform.position + Vector3.up * Mathf.Max(x, y) * 2.2f + new Vector3((x - 1) / 2f, 0, 0) -Vector3.forward * x*1.3f;
         heightPerlin = terrain.GetComponent<PerlinTerrain>().GetH();
 
         startingDelay = delay / 2;
@@ -136,7 +139,7 @@ public class GameManagerPerlin : MonoBehaviour
             yEnd = nPosition.y;
         }
         endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, checkTerrainPosition(), Time.fixedDeltaTime);
-        gyroPointer.transform.rotation = Input.gyro.attitude;
+        gyroPointer.transform.rotation = startRot*Input.gyro.attitude;
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
