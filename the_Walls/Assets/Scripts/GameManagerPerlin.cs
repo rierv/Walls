@@ -140,7 +140,8 @@ public class GameManagerPerlin : MonoBehaviour
             yEnd = nPosition.y;
         }
         endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, checkTerrainPosition(), Time.fixedDeltaTime);
-        gyroPointer.transform.rotation = startRot*startRotGyro*Input.gyro.attitude;
+        gyroPointer.transform.rotation = startRotGyro*Input.gyro.attitude*startRot;
+        Score.text = gyroPointer.transform.rotation+"";
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
