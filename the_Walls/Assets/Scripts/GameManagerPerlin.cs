@@ -39,6 +39,7 @@ public class GameManagerPerlin : MonoBehaviour
     Node lastEndPosition, currEndPosition;
     Color originaNpcColor;
     public float playerSpeed=2;
+    public GameObject gyroPointer;
     void Start()
     {
         if (!Input.gyro.enabled)
@@ -135,7 +136,7 @@ public class GameManagerPerlin : MonoBehaviour
             yEnd = nPosition.y;
         }
         endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, checkTerrainPosition(), Time.fixedDeltaTime);
-
+        gyroPointer.transform.rotation = Input.gyro.attitude;
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
@@ -150,12 +151,18 @@ public class GameManagerPerlin : MonoBehaviour
             }
             if (Input.gyro.attitude != Quaternion.identity)
             {
+                if (gyroPointer.transform.up.z > .1f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.up.z < -.1f) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                if (gyroPointer.transform.up.x > .1f) pointer.transform.Rotate(Vector3.up);
+                if (gyroPointer.transform.up.x < -.1f) pointer.transform.Rotate(-Vector3.up);
+
                 //endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * Mathf.Clamp(Input.gyro.attitude.y*5, -3, 3), .1f );
-                if ((Input.gyro.attitude.y > .15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.y < -.15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
+                /*if ((Input.gyro.attitude.y > .15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.y < -.15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) + myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
                 if ((Input.gyro.attitude.y < -.15f && Input.gyro.attitude.w > 0) || (Input.gyro.attitude.y > .15f && Input.gyro.attitude.w < 0)) endMaterial.transform.Translate((getNodePosition(matrix[xEnd, yEnd]) - myCamera.transform.forward * playerSpeed - endMaterial.transform.position) * Time.fixedDeltaTime);
 
                 if ((Input.gyro.attitude.x > .15f && Input.gyro.attitude.w >0)|| (Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w < 0)) pointer.transform.Rotate(Vector3.up);
                 if ((Input.gyro.attitude.x < -.15f && Input.gyro.attitude.w > 0)|| (Input.gyro.attitude.x > .15f && Input.gyro.attitude.w < 0)) pointer.transform.Rotate(-Vector3.up);
+            */
             }
 
         }
