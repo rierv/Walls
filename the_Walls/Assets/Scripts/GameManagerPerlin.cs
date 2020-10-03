@@ -236,7 +236,7 @@ public class GameManagerPerlin : MonoBehaviour
                     if (touchedObject.name == "Terrain")
                     {
                         Node n = g.FindNear(blockMaterial.transform.position.x, blockMaterial.transform.position.z, blockMaterial.transform.position.y, td.size.x/x, td.size.z/y, xEnd, yEnd);
-                        if (n != null)
+                        if (n != null && !blockList.Contains(n) && n!=matrix[xEnd,yEnd] && n!=currentNode)
                         { 
                             if ((!boost || !boostList.Contains(n)) && (!freeze || !freezeList.Contains(n)) && !blockList.Contains(n) && int.Parse(Blocks.text) > 0 && n != currentNode)
                             {
@@ -340,6 +340,7 @@ public class GameManagerPerlin : MonoBehaviour
             else if (isPlayerOnSight() || sawTheEnd)
             {
                 removeNodeFromBlockList(currentNode);
+                removeNodeFromBlockList(matrix[xEnd, yEnd]);
                 currEndPosition = matrix[xEnd, yEnd];
                 lastEndPosition = matrix[xEnd, yEnd];
                 sawTheEnd = false;
