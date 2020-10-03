@@ -103,7 +103,7 @@ public class Graph {
 
     public Node FindNear(float x, float y, float height, float xSize, float ySize, int xend, int yend)
     {
-        float min = float.MaxValue;
+        float min = 2;
         Node candidate = null;
         foreach (Node n in getNodes())
         {

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using System.Xml.Serialization;
+
 public class GameManagerPerlin : MonoBehaviour
 {
     public Terrain terrain;
@@ -17,7 +19,7 @@ public class GameManagerPerlin : MonoBehaviour
     public int x = 10, y = 10, speed = 5, blocks = 5, RandomSeed = 0;
     [Range(0f, 1f)] public float edgeProbability = 0.75f;
     public float delay = 0.3f, acceleration = 1f, timeElapsed=0;
-    public GameObject startMaterial = null, obstacleMaterial = null, endMaterial = null, boostMaterial = null, freezeMaterial = null;
+    public GameObject startMaterial = null, obstacleMaterial = null, endMaterial = null, boostMaterial = null, freezeMaterial = null, blockMaterial=null;
     // what to put on the scene, not really meaningful
     List<Edge> totalPath = new List<Edge>();
     protected Node[,] matrix;
@@ -41,6 +43,7 @@ public class GameManagerPerlin : MonoBehaviour
     public float playerSpeed=2;
     public GameObject gyroPointer;
     Quaternion startRot, startRotGyro;
+    Node lastBlockAllowedPosition;
     void Start()
     {
 
@@ -116,6 +119,8 @@ public class GameManagerPerlin : MonoBehaviour
         startMaterial.transform.position = getNodePosition(matrix[xStart, yStart]) + Vector3.up*.5f;
         endMaterial = Instantiate(endMaterial);
         endMaterial.transform.position = getNodePosition(matrix[xEnd, yEnd]);
+        blockMaterial = Instantiate(obstacleMaterial);
+        blockMaterial.transform.position = endMaterial.transform.position - Vector3.up;
 
         if (thirdPersonView)
         {
@@ -126,8 +131,7 @@ public class GameManagerPerlin : MonoBehaviour
         
         lastEndPosition = null;
         currEndPosition = null;
-        startRotGyro = Quaternion.Inverse(Input.gyro.attitude);
-
+        lastBlockAllowedPosition = null;
     }
 
     void FixedUpdate()
@@ -137,12 +141,16 @@ public class GameManagerPerlin : MonoBehaviour
         Node nPosition = g.FindNear(endMaterial.transform.position.x, endMaterial.transform.position.z, endMaterial.transform.position.y, td.size.x / x, td.size.z / y, xEnd, yEnd);
         if (xEnd != nPosition.x || yEnd != nPosition.y)
         {
+            lastBlockAllowedPosition = matrix[xEnd, yEnd];
+            removeNodeFromBlockList(matrix[xEnd, yEnd]);
             xEnd = nPosition.x;
             yEnd = nPosition.y;
+            removeNodeFromBlockList(matrix[xEnd, yEnd]);
         }
+        if(lastBlockAllowedPosition!=null) blockMaterial.transform.position = Vector3.Lerp(blockMaterial.transform.position, getNodePosition(lastBlockAllowedPosition), Time.fixedDeltaTime);
         endMaterial.transform.position = Vector3.Lerp(endMaterial.transform.position, checkTerrainPosition(), Time.fixedDeltaTime);
         gyroPointer.transform.rotation = startRotGyro*Input.gyro.attitude;
-        Blocks.text = startRotGyro.x+""+ startRotGyro.y+""+ startRotGyro.z;
+
         if (thirdPersonView) {
             
             myCamera.transform.rotation= Quaternion.Lerp(myCamera.transform.rotation, pointer.transform.rotation, .4f);
@@ -211,8 +219,9 @@ public class GameManagerPerlin : MonoBehaviour
             StartCoroutine(AnimateSolution());
             if (blockRegeneration) StartCoroutine(BlocksRecovery(10 / blocks));
             start = false;
+            startRotGyro = Quaternion.Inverse(Input.gyro.attitude);
         }
-        if ((Input.touchCount == 1 && Input.GetTouch(0).phase == 0 || Input.GetMouseButtonDown(0)))
+        else if ((Input.touchCount == 1 && Input.GetTouch(0).phase == 0 || Input.GetMouseButtonDown(0)))
         {
             Ray ray;
             if (Input.touchCount == 1 && Input.GetTouch(0).phase == 0) ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
@@ -226,28 +235,26 @@ public class GameManagerPerlin : MonoBehaviour
                     GameObject touchedObject = hit.transform.gameObject;
                     if (touchedObject.name == "Terrain")
                     {
-                        Node n = g.FindNear(hit.point.x, hit.point.z, hit.point.y, td.size.x/x, td.size.z/y, xEnd, yEnd);
+                        Node n = g.FindNear(blockMaterial.transform.position.x, blockMaterial.transform.position.z, blockMaterial.transform.position.y, td.size.x/x, td.size.z/y, xEnd, yEnd);
                         if (n != null)
-                        {
-
+                        { 
                             if ((!boost || !boostList.Contains(n)) && (!freeze || !freezeList.Contains(n)) && !blockList.Contains(n) && int.Parse(Blocks.text) > 0 && n != currentNode)
                             {
                                 Blocks.text = "" + (int.Parse(Blocks.text) - 1);
+                                if (int.Parse(Blocks.text) == 0) blockMaterial.SetActive(false);
                                 GameObject newgo = Instantiate(obstacleMaterial);
-                                newgo.transform.position = new Vector3(n.x * (td.size.x / x), n.height + 1, n.y * (td.size.z / y));
+                                newgo.transform.position = blockMaterial.transform.position;//new Vector3(n.x * (td.size.x / x), n.height + 1, n.y * (td.size.z / y));
                                 n.sceneObject = newgo;
                                 g.RemoveNodeConnections(n);
                                 blockList.Add(n);
                                 if (seenList.Contains(n)) seenList.Remove(n);
                             }
-                            else if (!blockRegeneration && blockList.Contains(n))
+                            else if (!blockRegeneration)
                             {
-                                Blocks.text = "" + (int.Parse(Blocks.text) + 1);
-                                Destroy(n.sceneObject);
-                                AddNodeConnections(n, matrix, blockList);
-                                blockList.Remove(n);
+                                //removeNodeFromBlockList(n);
                             }
                         }
+                        //}
                     }
                 }
             }
@@ -586,5 +593,16 @@ public class GameManagerPerlin : MonoBehaviour
         }
 
         return new Vector3 (endMaterial.transform.position.x, getNodePosition(matrix[xEnd,yEnd]).y, endMaterial.transform.position.z);
+    }
+    void removeNodeFromBlockList(Node n)
+    {
+        if (blockList.Contains(n))
+        {
+            if (int.Parse(Blocks.text) == 0) blockMaterial.SetActive(true);
+            Blocks.text = "" + (int.Parse(Blocks.text) + 1);
+            Destroy(n.sceneObject);
+            AddNodeConnections(n, matrix, blockList);
+            blockList.Remove(n);
+        }
     }
 }
