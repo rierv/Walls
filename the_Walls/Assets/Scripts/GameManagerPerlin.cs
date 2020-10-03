@@ -40,7 +40,7 @@ public class GameManagerPerlin : MonoBehaviour
     Quaternion previousRotation, toRotation;
     Node lastEndPosition, currEndPosition;
     Color originaNpcColor;
-    public float playerSpeed=2;
+    public float playerSpeed=3;
     public GameObject gyroPointer;
     Quaternion startRot, startRotGyro;
     Node lastBlockAllowedPosition;
@@ -221,10 +221,10 @@ public class GameManagerPerlin : MonoBehaviour
             start = false;
             startRotGyro = Quaternion.Inverse(Input.gyro.attitude);
         }
-        else if ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved || Input.GetMouseButtonDown(0)))
+        else if ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Stationary || Input.GetMouseButtonDown(0)))
         {
             Ray ray;
-            if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Stationary) ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
             else ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             Debug.DrawRay(ray.origin, ray.direction * 100, Color.yellow, 100f);
@@ -351,10 +351,13 @@ public class GameManagerPerlin : MonoBehaviour
             }
             else
             {
+                Node target;
                 currEndPosition = null;
+                target = bestNodeinSight();
+                //removeNodeFromBlockList(target);
                 removeNodeFromBlockList(currentNode);
                 startMaterial.GetComponent<MeshRenderer>().material.color = originaNpcColor;
-                path = AStarSolver.Solve(g, currentNode, bestNodeinSight(), myHeuristics[(int)Heuristics.Sight]);
+                path = AStarSolver.Solve(g, currentNode, target, myHeuristics[(int)Heuristics.Sight]);
                 count = 0;
             }
         }
@@ -545,20 +548,30 @@ public class GameManagerPerlin : MonoBehaviour
         float maxDistance=0;
 
         if (currentNode == lastEndPosition) lastEndPosition = null;
-        else if (lastEndPosition!=null) return lastEndPosition;
-        foreach (Node n in seenList)
+        if (lastEndPosition != null)
         {
-            near = 0;
-            foreach (Edge e in g.getConnections(n))
-                if (!seenList.Contains(e.to)) near++;
-            if (near > minNear && Vector3.Distance(getNodePosition(n), getNodePosition(currentNode)) > maxDistance)
-            {
-                minNear = near;
-                maxDistance = Vector3.Distance(getNodePosition(n), getNodePosition(currentNode));
-                candidate = n;
-            }
+            candidate = lastEndPosition;
         }
-        if (candidate == null) candidate=g.getConnections(currentNode)[0].to;
+        else
+        {
+            foreach (Node n in seenList)
+            {
+                near = 0;
+                foreach (Edge e in g.getConnections(n))
+                    if (!seenList.Contains(e.to)) near++;
+                if (near > minNear && Vector3.Distance(getNodePosition(n), getNodePosition(currentNode)) > maxDistance)
+                {
+                    minNear = near;
+                    maxDistance = Vector3.Distance(getNodePosition(n), getNodePosition(currentNode));
+                    candidate = n;
+                }
+            }
+            if (candidate == null) candidate = g.getConnections(currentNode)[0].to;
+        }
+        if (blockList.Contains(candidate))
+        {
+            candidate = nearestAviablePosition(candidate);
+        }
         return candidate;
     }
     bool isPlayerOnSight()
@@ -608,4 +621,17 @@ public class GameManagerPerlin : MonoBehaviour
             blockList.Remove(n);
         }
     }
+    Node nearestAviablePosition(Node candidate)
+    {
+        Node tmp = null;
+        AddNodeConnections(candidate, matrix, blockList);
+        foreach(Edge e in g.getConnections(candidate))
+        {
+            if (!blockList.Contains(e.to)) tmp = e.to;
+        }
+        g.RemoveNodeConnections(candidate);
+
+        return tmp;
+    }
+
 }
