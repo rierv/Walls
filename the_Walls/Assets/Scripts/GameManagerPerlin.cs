@@ -221,10 +221,10 @@ public class GameManagerPerlin : MonoBehaviour
             start = false;
             startRotGyro = Quaternion.Inverse(Input.gyro.attitude);
         }
-        else if ((Input.touchCount == 1 && Input.GetTouch(0).phase == 0 || Input.GetMouseButtonDown(0)))
+        else if ((Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved || Input.GetMouseButtonDown(0)))
         {
             Ray ray;
-            if (Input.touchCount == 1 && Input.GetTouch(0).phase == 0) ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
             else ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             Debug.DrawRay(ray.origin, ray.direction * 100, Color.yellow, 100f);
@@ -339,6 +339,7 @@ public class GameManagerPerlin : MonoBehaviour
             }
             else if (isPlayerOnSight() || sawTheEnd)
             {
+                removeNodeFromBlockList(currentNode);
                 currEndPosition = matrix[xEnd, yEnd];
                 lastEndPosition = matrix[xEnd, yEnd];
                 sawTheEnd = false;
@@ -350,6 +351,7 @@ public class GameManagerPerlin : MonoBehaviour
             else
             {
                 currEndPosition = null;
+                removeNodeFromBlockList(currentNode);
                 startMaterial.GetComponent<MeshRenderer>().material.color = originaNpcColor;
                 path = AStarSolver.Solve(g, currentNode, bestNodeinSight(), myHeuristics[(int)Heuristics.Sight]);
                 count = 0;
