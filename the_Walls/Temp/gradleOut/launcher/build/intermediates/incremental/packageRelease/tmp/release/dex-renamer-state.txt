@@ -1,0 +1,4 @@
+#Mon Oct 05 23:41:21 CEST 2020
+base.0=D\:\\Projects\\unity_projects\\walls\\theWalls\\the_Walls\\Temp\\gradleOut\\launcher\\build\\intermediates\\transforms\\dexMerger\\release\\0
+path.0=classes.dex
+renamed.0=classes.dex

@@ -8747,8 +8747,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f448913e976f9ba4d912a29b20251af9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  min: 1
-  max: 30
+  min: 10
+  max: 40
 --- !u!114 &1774787730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8781,7 +8781,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 12
+  m_Text: 30
 --- !u!222 &1774787731
 CanvasRenderer:
   m_ObjectHideFlags: 0

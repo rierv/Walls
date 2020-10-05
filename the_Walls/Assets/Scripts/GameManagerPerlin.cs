@@ -142,7 +142,7 @@ public class GameManagerPerlin : MonoBehaviour
         if (xEnd != nPosition.x || yEnd != nPosition.y)
         {
             lastBlockAllowedPosition = matrix[xEnd, yEnd];
-            removeNodeFromBlockList(matrix[xEnd, yEnd]);
+            //removeNodeFromBlockList(matrix[xEnd, yEnd]);
             xEnd = nPosition.x;
             yEnd = nPosition.y;
             removeNodeFromBlockList(matrix[xEnd, yEnd]);
@@ -286,15 +286,17 @@ public class GameManagerPerlin : MonoBehaviour
                 }
                 else
                 {
+
                     delay = ((startingDelay + ((path[count].weight - heightLevels + 1) / 2)) / (1 + acceleration))/1.5f;
                     acceleration *= 1.1f;
-                    
+
                     if (path[count].to == matrix[xEnd, yEnd])
                     {
                         EndButton.SetActive(true);
                         EndButton.GetComponentInChildren<Text>().text = "Sorry, End of the Run\nScore: " + Score.text;
                         done = true;
                     }
+                    
                     else if (boostList.Contains(path[count].to))
                     {
                         StartCoroutine(ChangeOfSpeedCoroutine(1, 1.6f));
@@ -339,8 +341,8 @@ public class GameManagerPerlin : MonoBehaviour
             }
             else if (isPlayerOnSight() || sawTheEnd)
             {
-                removeNodeFromBlockList(currentNode);
-                removeNodeFromBlockList(matrix[xEnd, yEnd]);
+                //removeNodeFromBlockList(currentNode);
+                //removeNodeFromBlockList(matrix[xEnd, yEnd]);
                 currEndPosition = matrix[xEnd, yEnd];
                 lastEndPosition = matrix[xEnd, yEnd];
                 sawTheEnd = false;
@@ -355,7 +357,7 @@ public class GameManagerPerlin : MonoBehaviour
                 currEndPosition = null;
                 target = bestNodeinSight();
                 //removeNodeFromBlockList(target);
-                removeNodeFromBlockList(currentNode);
+                //removeNodeFromBlockList(currentNode);
                 startMaterial.GetComponent<MeshRenderer>().material.color = originaNpcColor;
                 path = AStarSolver.Solve(g, currentNode, target, myHeuristics[(int)Heuristics.Sight]);
                 count = 0;
@@ -551,6 +553,7 @@ public class GameManagerPerlin : MonoBehaviour
         if (lastEndPosition != null)
         {
             candidate = lastEndPosition;
+            lastEndPosition = null;
         }
         else
         {
@@ -624,12 +627,12 @@ public class GameManagerPerlin : MonoBehaviour
     Node nearestAviablePosition(Node candidate)
     {
         Node tmp = null;
-        AddNodeConnections(candidate, matrix, blockList);
+        if (blockList.Contains(candidate)) AddNodeConnections(candidate, matrix, blockList);
         foreach(Edge e in g.getConnections(candidate))
         {
             if (!blockList.Contains(e.to)) tmp = e.to;
         }
-        g.RemoveNodeConnections(candidate);
+        if(blockList.Contains(candidate)) g.RemoveNodeConnections(candidate);
 
         return tmp;
     }
