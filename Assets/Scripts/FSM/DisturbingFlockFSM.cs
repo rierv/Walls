@@ -50,7 +50,7 @@ public class DisturbingFlockFSM : MonoBehaviour
 
     void Update()
     {
-        if (currNode!=null) transform.position = Vector3.Lerp(transform.position, currNode.sceneObject.transform.position + Vector3.up * (1.5f + currNode.height / 1.5f), .2f);
+        if (currNode!=null) transform.position = Vector3.Lerp(transform.position, GameManagerPerlin.getNodePosition(currNode) + Vector3.up, .2f);
         else transform.position = Vector3.Lerp(transform.position, transform.position + Vector3.up * Random.Range(-1,1) + Vector3.right * Random.Range(-1,1), .9f);
 
         if (((Input.touchCount == 1 && Input.GetTouch(0).phase == 0) || Input.GetMouseButtonDown(0)))
@@ -137,7 +137,8 @@ public class DisturbingFlockFSM : MonoBehaviour
 
     Node getRandomNode()
     {
-        g = GameObject.Find("GameManager").GetComponent<GameManager>().g;
+        if (GameObject.Find("GameManager").GetComponent<GameManager>() != null) g = GameObject.Find("GameManager").GetComponent<GameManager>().g;
+        else g=GameObject.Find("GameManager").GetComponent<GameManagerPerlin>().g;
         int count = 0;
         Node[] nodes = g.getNodes();
         while (Random.Range(0f, 1f) > 0.005) count = (count + 1) % nodes.Length;

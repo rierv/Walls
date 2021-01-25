@@ -24,7 +24,6 @@ public class StartButton : MonoBehaviour
             Scenes.setParam("blockRegeneration", blockRegeneration.isOn+"");
             Scenes.setParam("DecorativeF", decorativeF.isOn + "");
             Scenes.setParam("DisturbingF", disturbingF.isOn + "");
-            Scenes.setParam("thirdPersonView", thirdPersonView.isOn + "");
             Scenes.setParam("DunesHeight", dunesHeight.text);
 
         }
