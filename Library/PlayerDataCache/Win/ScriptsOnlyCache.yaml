@@ -637,7 +637,7 @@ ScriptsOnlyBuild:
     className: TimelineAsset
   - hash:
       serializedVersion: 2
-      Hash: 624754e5f7ac4eeb302463d41680a7f9
+      Hash: 0cb8924f2891c7f5d34402b9f4050a34
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: CharacterController
